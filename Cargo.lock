@@ -1192,7 +1192,7 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "leo-asg"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "criterion",
  "indexmap",
@@ -1207,7 +1207,7 @@ dependencies = [
 
 [[package]]
 name = "leo-ast"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "criterion",
  "indexmap",
@@ -1221,7 +1221,7 @@ dependencies = [
 
 [[package]]
 name = "leo-compiler"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "bincode",
  "hex",
@@ -1255,7 +1255,7 @@ dependencies = [
 
 [[package]]
 name = "leo-gadgets"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "criterion",
  "rand",
@@ -1269,7 +1269,7 @@ dependencies = [
 
 [[package]]
 name = "leo-grammar"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "criterion",
  "from-pest",
@@ -1285,7 +1285,7 @@ dependencies = [
 
 [[package]]
 name = "leo-imports"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "indexmap",
  "leo-asg",
@@ -1297,7 +1297,7 @@ dependencies = [
 
 [[package]]
 name = "leo-input"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "from-pest",
  "pest",
@@ -1309,7 +1309,7 @@ dependencies = [
 
 [[package]]
 name = "leo-lang"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "anyhow",
  "clap",
@@ -1350,11 +1350,11 @@ dependencies = [
 
 [[package]]
 name = "leo-linter"
-version = "1.2.2"
+version = "1.2.3"
 
 [[package]]
 name = "leo-package"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "lazy_static",
  "serde",
@@ -1367,7 +1367,7 @@ dependencies = [
 
 [[package]]
 name = "leo-state"
-version = "1.2.2"
+version = "1.2.3"
 dependencies = [
  "indexmap",
  "leo-ast",
@@ -2281,9 +2281,9 @@ checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
 name = "security-framework"
-version = "2.1.0"
+version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6af1b6204f89cf0069736daf8b852573e3bc34898eee600e95d3dd855c12e81"
+checksum = "2dfd318104249865096c8da1dfabf09ddbb6d0330ea176812a62ec75e40c4166"
 dependencies = [
  "bitflags",
  "core-foundation",
@@ -2294,9 +2294,9 @@ dependencies = [
 
 [[package]]
 name = "security-framework-sys"
-version = "2.1.0"
+version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31531d257baab426203cf81c5ce1b0b55159dda7ed602ac81b582ccd62265741"
+checksum = "dee48cdde5ed250b0d3252818f646e174ab414036edb884dde62d80a3ac6082d"
 dependencies = [
  "core-foundation-sys",
  "libc",
@@ -2470,8 +2470,6 @@ checksum = "fe0f37c9e8f3c5a4a66ad655a93c74daac4ad00c441533bf5c6e7990bb42604e"
 [[package]]
 name = "snarkvm-algorithms"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "739c2aaf5dbf6322d3a40bbb9739a87d458f32460da1b8affeae45214ec88e8c"
 dependencies = [
  "blake2",
  "derivative",
@@ -2491,8 +2489,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-curves"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c39148bec803c5e41b0696326a60817d9b84c4c2c1df6ea5be56f857b078988"
 dependencies = [
  "derivative",
  "rand",
@@ -2507,8 +2503,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-derives"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "24c5c4170d43a65e23bce115d6d2940c7fc66e1562a7822dd460db56f1fb07b1"
 dependencies = [
  "proc-macro-crate",
  "proc-macro-error",
@@ -2520,8 +2514,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-dpc"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3feb5d2cec547779e0acec01cd58f5d5fe6aac60cc4804e5e3cf9c807bb1880"
 dependencies = [
  "anyhow",
  "blake2",
@@ -2543,8 +2535,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-errors"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cfe9f6fac097aed079fa68a63c8989783b2cf21705de75bc91672dec60c9684"
 dependencies = [
  "base58",
  "bech32",
@@ -2557,8 +2547,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-gadgets"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "978bcc75bce7a1274f51b2adc4d69c30d866930aa37c656b4b8c1be5d631891c"
 dependencies = [
  "derivative",
  "digest 0.9.0",
@@ -2573,8 +2561,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-models"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c8da5920c6f4062c0d348e93ff0f72d17681c34f3c13ee4e99196495d896ed9"
 dependencies = [
  "anyhow",
  "bincode",
@@ -2593,8 +2579,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-objects"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4641e23002d38caeb51fa3244320355cab07eaf22d17dc44b481c763b63b5f4d"
 dependencies = [
  "base58",
  "bech32",
@@ -2615,28 +2599,37 @@ dependencies = [
 [[package]]
 name = "snarkvm-parameters"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8cb0f27fbccad7dee0ad4c2e5aeb0832c393fec76b4ad5d834c2e6cc0297e9a9"
 dependencies = [
  "curl",
  "hex",
  "snarkvm-algorithms",
  "snarkvm-errors",
  "snarkvm-models",
+ "snarkvm-polycommit",
+ "snarkvm-utilities",
+]
+
+[[package]]
+name = "snarkvm-polycommit"
+version = "0.0.5"
+dependencies = [
+ "derivative",
+ "digest 0.9.0",
+ "rand_core",
+ "snarkvm-algorithms",
+ "snarkvm-errors",
+ "snarkvm-models",
+ "snarkvm-profiler",
  "snarkvm-utilities",
 ]
 
 [[package]]
 name = "snarkvm-profiler"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fb5e9b964cb9653588607d8793bc7d6d0dfa78763a02d61aa3daa6c7d665e2b"
 
 [[package]]
 name = "snarkvm-storage"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ef134de5e33fe0577f3936e9dcf9bfac1973a0d820390e19558672808bad6b9"
 dependencies = [
  "anyhow",
  "bincode",
@@ -2657,8 +2650,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-utilities"
 version = "0.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "872c2ee1675c5039caf8cb4c5ef37b0ad844ffe7e0d81b68fb39f713da199561"
 dependencies = [
  "bincode",
  "rand",

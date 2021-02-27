@@ -52,8 +52,8 @@ impl SerializedCircuit {
 
 impl<E: PairingEngine> From<CircuitSynthesizer<E>> for SerializedCircuit {
     fn from(synthesizer: CircuitSynthesizer<E>) -> Self {
-        let num_inputs = synthesizer.input_assignment.len();
-        let num_aux = synthesizer.aux_assignment.len();
+        let num_inputs = synthesizer.public_variables.len();
+        let num_aux = synthesizer.private_variables.len();
         let num_constraints = synthesizer.num_constraints();
 
         // Serialize assignments
@@ -61,8 +61,8 @@ impl<E: PairingEngine> From<CircuitSynthesizer<E>> for SerializedCircuit {
             assignments.iter().map(SerializedField::from).collect()
         }
 
-        let input_assignment = get_serialized_assignments::<E>(&synthesizer.input_assignment);
-        let aux_assignment = get_serialized_assignments::<E>(&synthesizer.aux_assignment);
+        let input_assignment = get_serialized_assignments::<E>(&synthesizer.public_variables);
+        let aux_assignment = get_serialized_assignments::<E>(&synthesizer.private_variables);
 
         // Serialize constraints
         fn get_serialized_constraints<E: PairingEngine>(
@@ -174,8 +174,8 @@ impl TryFrom<SerializedCircuit> for CircuitSynthesizer<Bls12_377> {
         }
 
         Ok(CircuitSynthesizer::<Bls12_377> {
-            input_assignment,
-            aux_assignment,
+            public_variables: input_assignment,
+            private_variables: aux_assignment,
             at,
             bt,
             ct,

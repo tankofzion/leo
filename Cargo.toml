@@ -1,6 +1,6 @@
 [package]
 name = "leo-lang"
-version = "1.2.2"
+version = "1.2.3"
 authors = [ "The Aleo Team <hello@aleo.org>" ]
 description = "The Leo programming language"
 homepage = "https://aleo.org"
@@ -35,59 +35,59 @@ members = [
   "input",
   "linter",
   "package",
-  "state",
+  "state"
 ]
 
 [dependencies.leo-ast]
 path = "./ast"
-version = "1.2.2"
+version = "1.2.3"
 
 [dependencies.leo-compiler]
 path = "./compiler"
-version = "1.2.2"
+version = "1.2.3"
 
 [dependencies.leo-gadgets]
 path = "./gadgets"
-version = "1.2.2"
+version = "1.2.3"
 
 [dependencies.leo-imports]
 path = "./imports"
-version = "1.2.2"
+version = "1.2.3"
 
 [dependencies.leo-input]
 path = "./input"
-version = "1.2.2"
+version = "1.2.3"
 
 [dependencies.leo-package]
 path = "./package"
-version = "1.2.2"
+version = "1.2.3"
 
 [dependencies.leo-state]
 path = "./state"
-version = "1.2.2"
+version = "1.2.3"
 
 [dependencies.snarkvm-algorithms]
-version = "0.0.5"
+path = "../snarkVM/algorithms"
 default-features = false
 
 [dependencies.snarkvm-curves]
-version = "0.0.5"
+path = "../snarkVM/curves"
 default-features = false
 
 [dependencies.snarkvm-errors]
-version = "0.0.5"
+path = "../snarkVM/errors"
 default-features = false
 
 [dependencies.snarkvm-gadgets]
-version = "0.0.5"
+path = "../snarkVM/gadgets"
 default-features = false
 
 [dependencies.snarkvm-models]
-version = "0.0.5"
+path = "../snarkVM/models"
 default-features = false
 
 [dependencies.snarkvm-utilities]
-version = "0.0.5"
+path = "../snarkVM/utilities"
 
 [dependencies.anyhow]
 version = "1.0"

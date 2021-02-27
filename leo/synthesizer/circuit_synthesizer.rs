@@ -27,8 +27,8 @@ pub struct CircuitSynthesizer<E: PairingEngine> {
     pub(crate) ct: Vec<Vec<(E::Fr, Index)>>,
 
     // Assignments of variables
-    pub(crate) input_assignment: Vec<E::Fr>,
-    pub(crate) aux_assignment: Vec<E::Fr>,
+    pub(crate) public_variables: Vec<E::Fr>,
+    pub(crate) private_variables: Vec<E::Fr>,
 }
 
 impl<E: PairingEngine> ConstraintSystem<E::Fr> for CircuitSynthesizer<E> {
@@ -41,8 +41,8 @@ impl<E: PairingEngine> ConstraintSystem<E::Fr> for CircuitSynthesizer<E> {
         A: FnOnce() -> AR,
         AR: AsRef<str>,
     {
-        let index = self.aux_assignment.len();
-        self.aux_assignment.push(f()?);
+        let index = self.private_variables.len();
+        self.private_variables.push(f()?);
         Ok(Variable::new_unchecked(Index::Aux(index)))
     }
 
@@ -53,8 +53,8 @@ impl<E: PairingEngine> ConstraintSystem<E::Fr> for CircuitSynthesizer<E> {
         A: FnOnce() -> AR,
         AR: AsRef<str>,
     {
-        let index = self.input_assignment.len();
-        self.input_assignment.push(f()?);
+        let index = self.public_variables.len();
+        self.public_variables.push(f()?);
         Ok(Variable::new_unchecked(Index::Input(index)))
     }
 
@@ -98,6 +98,14 @@ impl<E: PairingEngine> ConstraintSystem<E::Fr> for CircuitSynthesizer<E> {
 
     fn num_constraints(&self) -> usize {
         self.at.len()
+    }
+
+    fn num_public_variables(&self) -> usize {
+        self.public_variables.len()
+    }
+
+    fn num_private_variables(&self) -> usize {
+        self.private_variables.len()
     }
 }
 
