@@ -14,8 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::tokenizer::{Char, Token};
-use serde::{Deserialize, Serialize};
+use crate::{
+    ast::{common::Span, values::Char},
+    tokenizer::Token,
+};
 
 use std::{borrow::Borrow, fmt, string};
 
@@ -402,11 +404,10 @@ impl<'a> Token<'a> {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone)]
 pub struct SpannedToken<'a> {
-    #[serde(borrow)]
     pub token: Token<'a>,
-    // pub span: Span,
+    pub span: Span,
 }
 
 impl<'a> fmt::Display for SpannedToken<'a> {

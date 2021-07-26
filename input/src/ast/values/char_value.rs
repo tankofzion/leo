@@ -14,8 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
 
-pub mod common;
-pub use common::*;
+use crate::common::Span;
 
-pub mod values;
-pub use values::*;
+use std::fmt;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Char {
+    Scalar(char),
+    NonScalar(u32),
+}
+
+impl fmt::Display for Char {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Scalar(c) => write!(f, "{}", c),
+            Self::NonScalar(c) => write!(f, "\\u{{{:X}}}", c),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct CharValue {
+    pub value: Char,
+    pub span: Span,
+}
+
+impl fmt::Display for CharValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}

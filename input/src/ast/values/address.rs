@@ -14,8 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
 
-pub mod common;
-pub use common::*;
+use crate::common::Span;
 
-pub mod values;
-pub use values::*;
+use wasm_bindgen::prelude::*;
+
+use std::fmt;
+
+#[wasm_bindgen]
+#[derive(Clone, Copy, Debug)]
+pub struct Address {
+    pub value: &'static str,
+    pub span: Span,
+}
+
+impl fmt::Display for Address {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.value)
+    }
+}

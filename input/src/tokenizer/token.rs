@@ -14,27 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
 
-use serde::{Deserialize, Serialize};
+use crate::ast::values::Char;
 
 use std::{fmt, string};
 
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-pub enum Char {
-    Scalar(char),
-    NonScalar(u32),
-}
-
-impl fmt::Display for Char {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Scalar(c) => write!(f, "{}", c),
-            Self::NonScalar(c) => write!(f, "{}", c),
-        }
-    }
-}
-
 /// Represents all valid Leo syntax tokens.
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Token<'a> {
     // Lexical Grammar
     // Literals
