@@ -14,14 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::ast::Rule;
+pub(crate) mod lexer;
+pub(crate) use self::lexer::*;
 
-use pest::Span;
-use pest_ast::FromPest;
-
-#[derive(Clone, Debug, FromPest, PartialEq)]
-#[pest_ast(rule(Rule::main))]
-pub struct Main<'ast> {
-    #[pest_ast(outer())]
-    pub span: Span<'ast>,
-}
+pub(crate) mod token;
+pub(crate) use self::token::*;

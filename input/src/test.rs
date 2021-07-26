@@ -14,25 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::{
-    ast::Rule,
-    types::{ArrayDimensions, Type},
+use leo_test_framework::{
+    runner::{Namespace, ParseType, Runner},
+    Test,
 };
-
-use pest::Span;
-use pest_ast::FromPest;
-
-#[derive(Clone, Debug, FromPest, PartialEq, Eq)]
-#[pest_ast(rule(Rule::type_array))]
-pub struct ArrayType<'ast> {
-    pub type_: Box<Type<'ast>>,
-    pub dimensions: ArrayDimensions<'ast>,
-    #[pest_ast(outer())]
-    pub span: Span<'ast>,
-}
-
-impl<'ast> std::fmt::Display for ArrayType<'ast> {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "[{}; ({})]", self.type_, self.dimensions)
-    }
-}
+use serde_yaml::Value;

@@ -17,20 +17,25 @@ include = [ "Cargo.toml", "src", "README.md", "LICENSE.md" ]
 license = "GPL-3.0"
 edition = "2018"
 
-[dependencies.from-pest]
-version = "0.3.1"
-
-[dependencies.pest]
-version = "2.0"
-
-[dependencies.pest-ast]
-version = "0.3.3"
-
-[dependencies.pest_derive]
-version = "2.0"
+[dependencies.serde]
+version = "1.0"
+features = [ "derive" ]
 
 [dependencies.thiserror]
 version = "1.0"
 
 [dependencies.tracing]
 version = "0.1"
+
+[dependencies.wasm-bindgen]
+version = "0.2.74"
+
+[dev-dependencies.criterion]
+version = "0.3"
+
+[dev-dependencies.serde_yaml]
+version = "0.8"
+
+[dev-dependencies.leo-test-framework]
+path = "../test-framework"
+version = "1.5.2"

@@ -13,44 +13,28 @@
 
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
-#[macro_use]
-extern crate pest_derive;
+
 #[macro_use]
 extern crate thiserror;
+extern crate wasm_bindgen;
+
+use wasm_bindgen::prelude::*;
+
+pub mod ast;
+pub use ast::*;
 
 pub mod errors;
 pub use errors::*;
 
-mod ast;
-pub mod common;
-pub mod definitions;
-pub mod expressions;
-pub mod files;
-pub mod parameters;
-pub mod sections;
-pub mod tables;
-pub mod types;
-pub mod values;
+// pub mod parser;
+// pub use parser::*;
 
-use from_pest::FromPest;
-use std::{fs, path::Path};
+pub(crate) mod tokenizer;
+pub(crate) use tokenizer::*;
 
-pub struct LeoInputParser;
+#[cfg(test)]
+mod test;
 
-impl LeoInputParser {
-    /// Reads in the given file path into a string.
-    pub fn load_file(file_path: &Path) -> Result<String, InputParserError> {
-        fs::read_to_string(file_path).map_err(|_| InputParserError::FileReadError(file_path.to_owned()))
-    }
-
-    /// Parses the input file and constructs a syntax tree.
-    pub fn parse_file(input_file: &str) -> Result<files::File, InputParserError> {
-        // Parse the file using leo-input.pest
-        let mut file = ast::parse(input_file)?;
-
-        // Build the abstract syntax tree
-        let syntax_tree = files::File::from_pest(&mut file).map_err(|_| InputParserError::SyntaxTreeError)?;
-
-        Ok(syntax_tree)
-    }
-}
+/// Creates a new input AST from a given file path and input source code text.
+#[wasm_bindgen]
+pub fn parse_input() {}

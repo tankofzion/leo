@@ -14,20 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::{
-    ast::Rule,
-    errors::SyntaxError as InputSyntaxError,
-    expressions::{ArrayInlineExpression, Expression},
-    sections::Header,
-    tables::Table,
-    types::{DataType, IntegerType, Type},
-    values::{NumberValue, Value},
-};
+use crate::errors::SyntaxError as InputSyntaxError;
 
-use pest::{
-    error::{Error, ErrorVariant},
-    Span,
-};
 use std::{num::ParseIntError, path::PathBuf, str::ParseBoolError};
 
 #[derive(Debug, Error)]
@@ -52,161 +40,155 @@ pub enum InputParserError {
 }
 
 impl InputParserError {
-    pub fn set_path(&mut self, path: &str, _content: &[String]) {
-        if let InputParserError::SyntaxError(error) = self {
-            let new_error: Error<Rule> = match error {
-                InputSyntaxError::Error(error) => {
-                    let new_error = error.clone();
-                    new_error.with_path(path)
-                }
-            };
+    // pub fn set_path(&mut self, path: &str, _content: &[String]) {
+    //     if let InputParserError::SyntaxError(error) = self {
+    //         let new_error: Error<Rule> = match error {
+    //             InputSyntaxError::Error(error) => {
+    //                 let new_error = error.clone();
+    //                 new_error.with_path(path)
+    //             }
+    //         };
 
-            tracing::error!("{}", new_error);
+    //         tracing::error!("{}", new_error);
 
-            *error = InputSyntaxError::Error(new_error);
-        }
-    }
+    //         *error = InputSyntaxError::Error(new_error);
+    //     }
+    // }
 
-    pub fn get_path(&self) -> Option<&str> {
-        None
-    }
+    // pub fn get_path(&self) -> Option<&str> {
+    //     None
+    // }
 
-    fn new_from_span(message: String, span: &Span) -> Self {
-        let error = Error::new_from_span(ErrorVariant::CustomError { message }, span.to_owned());
+    // fn new_from_span(message: String, span: &Span) -> Self {
+    //     let error = Error::new_from_span(ErrorVariant::CustomError { message }, span.to_owned());
 
-        InputParserError::SyntaxError(InputSyntaxError::from(error))
-    }
+    //     InputParserError::SyntaxError(InputSyntaxError::from(error))
+    // }
 
-    pub fn array_index(actual: String, span: &Span) -> Self {
-        let message = format!("Expected constant number for array index, found `{}`", actual);
+    // pub fn array_index(actual: String, span: &Span) -> Self {
+    //     let message = format!("Expected constant number for array index, found `{}`", actual);
 
-        Self::new_from_span(message, span)
-    }
+    //     Self::new_from_span(message, span)
+    // }
 
-    pub fn integer_type_mismatch(expected: IntegerType, received: IntegerType, span: &Span) -> Self {
-        let message = format!("expected data type `{}`, found `{}`", expected, received);
+    // pub fn integer_type_mismatch(expected: IntegerType, received: IntegerType, span: &Span) -> Self {
+    //     let message = format!("expected data type `{}`, found `{}`", expected, received);
 
-        Self::new_from_span(message, span)
-    }
+    //     Self::new_from_span(message, span)
+    // }
 
-    pub fn invalid_char(character: String, span: &Span) -> Self {
-        let message = format!("Expected valid character found `{}`", character);
+    // pub fn invalid_char(character: String, span: &Span) -> Self {
+    //     let message = format!("Expected valid character found `{}`", character);
 
-        Self::new_from_span(message, span)
-    }
+    //     Self::new_from_span(message, span)
+    // }
 
-    pub fn invalid_string_dimensions(span: &Span) -> Self {
-        let message = "String type defintion of a char array should not be multi-dimensional".to_string();
+    // pub fn invalid_string_dimensions(span: &Span) -> Self {
+    //     let message = "String type defintion of a char array should not be multi-dimensional".to_string();
 
-        Self::new_from_span(message, span)
-    }
+    //     Self::new_from_span(message, span)
+    // }
 
-    pub fn invalid_string_length(expected: usize, received: usize, span: &Span) -> Self {
-        let message = format!(
-            "Expected size of char array `{}` to match string size instead received `{}`",
-            expected, received
-        );
+    // pub fn invalid_string_length(expected: usize, received: usize, span: &Span) -> Self {
+    //     let message = format!(
+    //         "Expected size of char array `{}` to match string size instead received `{}`",
+    //         expected, received
+    //     );
 
-        Self::new_from_span(message, span)
-    }
+    //     Self::new_from_span(message, span)
+    // }
 
-    pub fn implicit_type(data_type: DataType, implicit: NumberValue) -> Self {
-        let message = format!("expected `{}`, found `{}`", data_type, implicit);
+    // pub fn implicit_type(data_type: DataType, implicit: NumberValue) -> Self {
+    //     let message = format!("expected `{}`, found `{}`", data_type, implicit);
 
-        Self::new_from_span(message, implicit.span())
-    }
+    //     Self::new_from_span(message, implicit.span())
+    // }
 
-    pub fn implicit_group(number: NumberValue) -> Self {
-        let message = format!("group coordinates should be in (x, y)group format, found `{}`", number);
+    // pub fn implicit_group(number: NumberValue) -> Self {
+    //     let message = format!("group coordinates should be in (x, y)group format, found `{}`", number);
 
-        Self::new_from_span(message, number.span())
-    }
+    //     Self::new_from_span(message, number.span())
+    // }
 
-    pub fn data_type_mismatch(data_type: DataType, value: Value) -> Self {
-        let message = format!("expected data type `{}`, found `{}`", data_type, value);
+    // pub fn data_type_mismatch(data_type: DataType, value: Value) -> Self {
+    //     let message = format!("expected data type `{}`, found `{}`", data_type, value);
 
-        Self::new_from_span(message, value.span())
-    }
+    //     Self::new_from_span(message, value.span())
+    // }
 
-    pub fn expression_type_mismatch(type_: Type, expression: Expression) -> Self {
-        let message = format!("expected expression type `{}`, found `{}`", type_, expression);
-        let span = expression.span().to_owned();
+    // pub fn expression_type_mismatch(type_: Type, expression: Expression) -> Self {
+    //     let message = format!("expected expression type `{}`, found `{}`", type_, expression);
+    //     let span = expression.span().to_owned();
 
-        Self::new_from_span(message, &span)
-    }
+    //     Self::new_from_span(message, &span)
+    // }
 
-    pub fn array_inline_length(number: usize, array: ArrayInlineExpression) -> Self {
-        let message = format!(
-            "expected an array with a fixed size of {} elements, found one with {} elements",
-            number,
-            array.expressions.len()
-        );
-        let span = array.span.to_owned();
+    // pub fn array_inline_length(number: usize, array: ArrayInlineExpression) -> Self {
+    //     let message = format!(
+    //         "expected an array with a fixed size of {} elements, found one with {} elements",
+    //         number,
+    //         array.expressions.len()
+    //     );
+    //     let span = array.span.to_owned();
 
-        Self::new_from_span(message, &span)
-    }
+    //     Self::new_from_span(message, &span)
+    // }
 
-    pub fn array_init_length(expected: Vec<usize>, actual: Vec<usize>, span: &Span) -> Self {
-        let message = format!(
-            "expected an array with a fixed size of {:?} elements, found one with {:?} elements",
-            expected, actual
-        );
+    // pub fn array_init_length(expected: Vec<usize>, actual: Vec<usize>, span: &Span) -> Self {
+    //     let message = format!(
+    //         "expected an array with a fixed size of {:?} elements, found one with {:?} elements",
+    //         expected, actual
+    //     );
 
-        Self::new_from_span(message, span)
-    }
+    //     Self::new_from_span(message, span)
+    // }
 
-    pub fn input_section_header(header: Header) -> Self {
-        let message = format!("the section header `{}` is not valid in an input `.in` file", header);
-        let span = header.span();
+    // pub fn input_section_header(header: Header) -> Self {
+    //     let message = format!("the section header `{}` is not valid in an input `.in` file", header);
+    //     let span = header.span();
 
-        Self::new_from_span(message, &span)
-    }
+    //     Self::new_from_span(message, &span)
+    // }
 
-    pub fn public_section(header: Header) -> Self {
-        let message = format!("the section header `{}` is not a public section", header);
-        let span = header.span();
+    // pub fn public_section(header: Header) -> Self {
+    //     let message = format!("the section header `{}` is not a public section", header);
+    //     let span = header.span();
 
-        Self::new_from_span(message, &span)
-    }
+    //     Self::new_from_span(message, &span)
+    // }
 
-    pub fn private_section(header: Header) -> Self {
-        let message = format!("the section header `{}` is not a private section", header);
-        let span = header.span();
+    // pub fn private_section(header: Header) -> Self {
+    //     let message = format!("the section header `{}` is not a private section", header);
+    //     let span = header.span();
 
-        Self::new_from_span(message, &span)
-    }
+    //     Self::new_from_span(message, &span)
+    // }
 
-    pub fn table(table: Table) -> Self {
-        let message = format!(
-            "the double bracket section `{}` is not valid in an input `.in` file",
-            table
-        );
+    // pub fn table(table: Table) -> Self {
+    //     let message = format!(
+    //         "the double bracket section `{}` is not valid in an input `.in` file",
+    //         table
+    //     );
 
-        Self::new_from_span(message, &table.span)
-    }
+    //     Self::new_from_span(message, &table.span)
+    // }
 
-    pub fn tuple_length(expected: usize, actual: usize, span: &Span) -> Self {
-        let message = format!(
-            "expected a tuple with {} elements, found a tuple with {} elements",
-            expected, actual
-        );
+    // pub fn tuple_length(expected: usize, actual: usize, span: &Span) -> Self {
+    //     let message = format!(
+    //         "expected a tuple with {} elements, found a tuple with {} elements",
+    //         expected, actual
+    //     );
 
-        Self::new_from_span(message, &span)
-    }
+    //     Self::new_from_span(message, &span)
+    // }
 
-    pub fn section(header: Header) -> Self {
-        let message = format!(
-            "the section header `{}` must have a double bracket visibility in a state `.state` file",
-            header
-        );
-        let span = header.span();
+    // pub fn section(header: Header) -> Self {
+    //     let message = format!(
+    //         "the section header `{}` must have a double bracket visibility in a state `.state` file",
+    //         header
+    //     );
+    //     let span = header.span();
 
-        Self::new_from_span(message, &span)
-    }
-}
-
-impl From<Error<Rule>> for InputParserError {
-    fn from(error: Error<Rule>) -> Self {
-        InputParserError::SyntaxError(InputSyntaxError::from(error))
-    }
+    //     Self::new_from_span(message, &span)
+    // }
 }
