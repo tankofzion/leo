@@ -18,15 +18,16 @@ use crate::{Function, Identifier, Node, Scope, Type};
 use leo_errors::{AsgError, Result, Span};
 
 use indexmap::IndexMap;
+use serde::Serialize;
 use std::cell::RefCell;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub enum CircuitMember<'a> {
     Variable(Type<'a>),
     Function(&'a Function<'a>),
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct Circuit<'a> {
     pub id: u32,
     pub name: RefCell<Identifier>,

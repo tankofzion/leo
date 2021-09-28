@@ -17,10 +17,11 @@
 use crate::Circuit;
 pub use leo_ast::IntegerType;
 
+use serde::Serialize;
 use std::fmt;
 
 /// A type in an asg.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Serialize, PartialEq)]
 pub enum Type<'a> {
     // Data types
     Address,
@@ -37,7 +38,7 @@ pub enum Type<'a> {
     Circuit(&'a Circuit<'a>),
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Serialize, PartialEq)]
 pub enum PartialType<'a> {
     Type(Type<'a>),                                    // non-array or tuple
     Integer(Option<IntegerType>, Option<IntegerType>), // specific, context-specific
