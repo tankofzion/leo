@@ -17,7 +17,7 @@
 use crate::context::Context;
 use leo_errors::Result;
 
-use std::time::Instant;
+// use std::time::Instant;
 use tracing::span::Span;
 
 // local program commands

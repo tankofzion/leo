@@ -87,6 +87,14 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
         // Evaluate branch 1
         let mut branch_1_result = self.enforce_statement(cs, &branch_1_indicator, statement.result.get())?;
 
+        for (boolean, value) in &branch_1_result {
+            println!(
+                "Branch 1 result: boolean: {}, value: {}",
+                indicator_to_string(boolean),
+                value
+            );
+        }
+
         results.append(&mut branch_1_result);
 
         // If outer_indicator && !inner_indicator, then select branch 2
@@ -112,10 +120,18 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
         };
 
         for (boolean, value) in &branch_2_result {
-            println!("boolean: {}, value: {}", indicator_to_string(boolean), value);
+            println!(
+                "Branch 2 result: boolean: {}, value: {}",
+                indicator_to_string(boolean),
+                value
+            );
         }
 
         results.append(&mut branch_2_result);
+
+        for (boolean, value) in &results {
+            println!("Results: boolean: {}, value: {}", indicator_to_string(boolean), value);
+        }
 
         // We return the results of both branches and leave it up to the caller to select the appropriate return
         Ok(results)

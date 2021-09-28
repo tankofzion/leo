@@ -16,6 +16,8 @@
 
 //! Enforces a statement in a compiled Leo program.
 
+use std::cmp::Ordering;
+
 use crate::{program::ConstrainedProgram, value::ConstrainedValue, GroupType};
 use leo_asg::{Node, Statement};
 use leo_errors::{CompilerError, Result};
@@ -26,6 +28,13 @@ use snarkvm_r1cs::ConstraintSystem;
 
 pub type StatementResult<T> = Result<T>;
 pub type IndicatorAndConstrainedValue<'a, T, U> = (Boolean, ConstrainedValue<'a, T, U>);
+
+fn indicator_to_string(indicator: &Boolean) -> String {
+    indicator
+        .get_value()
+        .map(|b| b.to_string())
+        .unwrap_or_else(|| "[input]".to_string())
+}
 
 impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
     ///
@@ -49,9 +58,15 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
 
         match statement {
             Statement::Return(statement) => {
-                let return_value = (*indicator, self.enforce_return_statement(cs, statement)?);
+                let (boolean, return_value) = (*indicator, self.enforce_return_statement(cs, statement)?);
 
-                results.push(return_value);
+                println!(
+                    "Enforcing RETURN. Bool: {}, Ret: {}",
+                    indicator_to_string(&boolean),
+                    return_value
+                );
+
+                results.push((boolean, return_value));
             }
             Statement::Definition(statement) => {
                 self.enforce_definition_statement(cs, statement)?;
@@ -97,6 +112,18 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
                 )?;
 
                 results.extend(result);
+
+                results.sort_by(|(val_1, _), (val_2, _)| {
+                    if let (Boolean::Constant(val_1), Boolean::Constant(val_2)) = (val_1, val_2) {
+                        val_1.cmp(val_2)
+                    } else {
+                        Ordering::Less
+                    }
+                });
+
+                for (res_bool, res_val) in &results {
+                    println!("{} {}", res_val, indicator_to_string(res_bool));
+                }
             }
             Statement::Empty(_) => (),
         };
