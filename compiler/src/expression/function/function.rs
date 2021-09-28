@@ -46,6 +46,8 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
 
         let return_value = self.enforce_function(&mut cs.ns(name_unique), function, target, arguments)?;
 
+        println!("return value from func {:?}", &return_value);
+
         Ok(return_value)
     }
 }

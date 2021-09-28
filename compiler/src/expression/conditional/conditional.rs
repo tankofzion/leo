@@ -42,9 +42,14 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
             }
         };
 
+        println!("{:?}", &conditional_value);
+
         let first_value = self.enforce_expression(cs, first)?;
 
         let second_value = self.enforce_expression(cs, second)?;
+
+        println!("{:?}", &first_value.to_string());
+        println!("{:?}", &second_value.to_string());
 
         let unique_namespace = cs.ns(|| {
             format!(

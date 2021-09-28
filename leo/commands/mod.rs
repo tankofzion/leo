@@ -104,15 +104,15 @@ pub trait Command {
         let span = span.enter();
 
         // Calculate the execution time for this command.
-        let timer = Instant::now();
+        // let timer = Instant::now();
         let out = self.apply(context, input);
 
         drop(span);
 
         // Use the done context to print the execution time for this command.
-        tracing::span!(tracing::Level::INFO, "Done").in_scope(|| {
-            tracing::info!("Finished in {} milliseconds \n", timer.elapsed().as_millis());
-        });
+        // tracing::span!(tracing::Level::INFO, "Done").in_scope(|| {
+        //     tracing::info!("Finished in {} milliseconds \n", timer.elapsed().as_millis());
+        // });
 
         out
     }

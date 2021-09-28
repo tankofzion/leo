@@ -49,6 +49,11 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
         // Inherit an indicator from a previous statement.
         let outer_indicator = indicator;
 
+        // panic!("");
+
+        println!("outer indicator: {}", indicator_to_string(outer_indicator));
+        println!("span is: {}", &span.content);
+
         // Evaluate the conditional boolean as the inner indicator
         let inner_indicator = match self.enforce_expression(cs, statement.condition.get())? {
             ConstrainedValue::Boolean(resolved) => resolved,
@@ -75,6 +80,8 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
         )
         .map_err(|_| CompilerError::statement_indicator_calculation(branch_1_name, &span))?;
 
+        println!("branch 1 indicator {}", indicator_to_string(&branch_1_indicator));
+
         let mut results = vec![];
 
         // Evaluate branch 1
@@ -96,11 +103,17 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
         )
         .map_err(|_| CompilerError::statement_indicator_calculation(branch_2_name, &span))?;
 
+        println!("branch 2 indicator {}", indicator_to_string(&branch_2_indicator));
+
         // Evaluate branch 2
         let mut branch_2_result = match statement.next.get() {
             Some(next) => self.enforce_statement(cs, &branch_2_indicator, next)?,
             None => vec![],
         };
+
+        for (boolean, value) in &branch_2_result {
+            println!("boolean: {}, value: {}", indicator_to_string(boolean), value);
+        }
 
         results.append(&mut branch_2_result);
 
