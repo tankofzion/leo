@@ -68,6 +68,9 @@ pub use cast::*;
 mod lengthof;
 pub use lengthof::*;
 
+mod err;
+pub use err::*;
+
 use crate::{ConstValue, FromAst, Node, PartialType, Scope, Type};
 use leo_errors::{Result, Span};
 
@@ -93,6 +96,8 @@ pub enum Expression<'a> {
     CircuitAccess(CircuitAccessExpression<'a>),
 
     Call(CallExpression<'a>),
+
+    Err(ErrExpression<'a>),
 }
 
 impl<'a> Expression<'a> {
@@ -121,6 +126,7 @@ impl<'a> Node for Expression<'a> {
             CircuitInit(x) => x.span(),
             CircuitAccess(x) => x.span(),
             Call(x) => x.span(),
+            Err(x) => x.span(),
         }
     }
 }
@@ -156,6 +162,7 @@ impl<'a> ExpressionNode<'a> for Expression<'a> {
             CircuitInit(x) => x.set_parent(parent),
             CircuitAccess(x) => x.set_parent(parent),
             Call(x) => x.set_parent(parent),
+            Err(x) => x.set_parent(parent),
         }
     }
 
@@ -178,6 +185,7 @@ impl<'a> ExpressionNode<'a> for Expression<'a> {
             CircuitInit(x) => x.get_parent(),
             CircuitAccess(x) => x.get_parent(),
             Call(x) => x.get_parent(),
+            Err(x) => x.get_parent(),
         }
     }
 
@@ -200,6 +208,7 @@ impl<'a> ExpressionNode<'a> for Expression<'a> {
             CircuitInit(x) => x.enforce_parents(expr),
             CircuitAccess(x) => x.enforce_parents(expr),
             Call(x) => x.enforce_parents(expr),
+            Err(x) => x.enforce_parents(expr),
         }
     }
 
@@ -222,6 +231,7 @@ impl<'a> ExpressionNode<'a> for Expression<'a> {
             CircuitInit(x) => x.get_type(),
             CircuitAccess(x) => x.get_type(),
             Call(x) => x.get_type(),
+            Err(x) => x.get_type(),
         }
     }
 
@@ -244,6 +254,7 @@ impl<'a> ExpressionNode<'a> for Expression<'a> {
             CircuitInit(x) => x.is_mut_ref(),
             CircuitAccess(x) => x.is_mut_ref(),
             Call(x) => x.is_mut_ref(),
+            Err(x) => x.is_mut_ref(),
         }
     }
 
@@ -266,6 +277,7 @@ impl<'a> ExpressionNode<'a> for Expression<'a> {
             CircuitInit(x) => x.const_value(),
             CircuitAccess(x) => x.const_value(),
             Call(x) => x.const_value(),
+            Err(x) => x.const_value(),
         }
     }
 
@@ -288,6 +300,7 @@ impl<'a> ExpressionNode<'a> for Expression<'a> {
             CircuitInit(x) => x.is_consty(),
             CircuitAccess(x) => x.is_consty(),
             Call(x) => x.is_consty(),
+            Err(x) => x.is_consty(),
         }
     }
 }
@@ -300,6 +313,9 @@ impl<'a> FromAst<'a, leo_ast::Expression> for &'a Expression<'a> {
     ) -> Result<Self> {
         use leo_ast::Expression::*;
         let expression = match value {
+            Err(value) => scope
+                .context
+                .alloc_expression(ErrExpression::from_ast(scope, value, expected_type).map(Expression::Err)?),
             Identifier(identifier) => Self::from_ast(scope, identifier, expected_type)?,
             Value(value) => scope
                 .context
@@ -383,6 +399,7 @@ impl<'a> Into<leo_ast::Expression> for &Expression<'a> {
             CircuitInit(x) => leo_ast::Expression::CircuitInit(x.into()),
             CircuitAccess(x) => x.into(),
             Call(x) => leo_ast::Expression::Call(x.into()),
+            Err(x) => leo_ast::Expression::Err(x.into()),
         }
     }
 }

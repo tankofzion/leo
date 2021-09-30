@@ -26,6 +26,13 @@ pub trait ReconstructingReducerExpression<'a> {
         value
     }
 
+    fn reduce_err(&mut self, input: ErrExpression<'a>) -> Expression<'a> {
+        Expression::Err(ErrExpression {
+            parent: input.parent,
+            span: input.span,
+        })
+    }
+
     fn reduce_array_access(
         &mut self,
         input: ArrayAccessExpression<'a>,

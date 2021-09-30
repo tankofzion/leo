@@ -56,6 +56,8 @@ mod cast;
 pub use cast::*;
 mod lengthof;
 pub use lengthof::*;
+mod err;
+pub use err::*;
 
 /// Expression that evaluates to a value
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -81,6 +83,10 @@ pub enum Expression {
     CircuitStaticFunctionAccess(CircuitStaticFunctionAccessExpression),
 
     Call(CallExpression),
+
+    /// An expression of type "error".
+    /// Will result in a compile error eventually.
+    Err(ErrExpression),
 }
 
 impl Node for Expression {
@@ -104,6 +110,7 @@ impl Node for Expression {
             Call(n) => n.span(),
             Cast(n) => n.span(),
             LengthOf(n) => n.span(),
+            Err(n) => n.span(),
         }
     }
 
@@ -127,6 +134,7 @@ impl Node for Expression {
             Call(n) => n.set_span(span),
             Cast(n) => n.set_span(span),
             LengthOf(n) => n.set_span(span),
+            Err(n) => n.set_span(span),
         }
     }
 }
@@ -152,6 +160,7 @@ impl fmt::Display for Expression {
             Call(n) => n.fmt(f),
             Cast(n) => n.fmt(f),
             LengthOf(n) => n.fmt(f),
+            Err(n) => n.fmt(f),
         }
     }
 }

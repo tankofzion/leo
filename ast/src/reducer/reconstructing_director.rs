@@ -78,6 +78,7 @@ impl<R: ReconstructingReducer> ReconstructingDirector<R> {
             }
 
             Expression::Call(call) => Expression::Call(self.reduce_call(call)?),
+            Expression::Err(s) => Expression::Err(s.clone()),
         };
 
         self.reducer.reduce_expression(expression, new)

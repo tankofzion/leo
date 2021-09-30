@@ -236,6 +236,7 @@ impl<'a> Into<leo_ast::ValueExpression> for &Constant<'a> {
             ConstValue::Tuple(_) => unimplemented!(),
             ConstValue::Array(_) => unimplemented!(),
             ConstValue::Circuit(_, _) => unimplemented!(),
+            ConstValue::Err => unimplemented!(),
         }
     }
 }

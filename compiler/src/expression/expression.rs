@@ -40,6 +40,7 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
         span: &Span,
     ) -> Result<ConstrainedValue<'a, F, G>> {
         Ok(match value {
+            ConstValue::Err => todo!(),
             ConstValue::Address(value) => ConstrainedValue::Address(Address::constant(value.to_string(), span)?),
             ConstValue::Boolean(value) => ConstrainedValue::Boolean(Boolean::Constant(*value)),
             ConstValue::Char(value) => {
@@ -95,6 +96,8 @@ impl<'a, F: PrimeField, G: GroupType<F>> ConstrainedProgram<'a, F, G> {
     ) -> Result<ConstrainedValue<'a, F, G>> {
         let span = &expression.span().cloned().unwrap_or_default();
         match expression {
+            Expression::Err(_) => todo!(),
+
             // Cast
             Expression::Cast(_) => unimplemented!("casts not implemented"),
 

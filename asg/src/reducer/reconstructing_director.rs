@@ -38,6 +38,7 @@ impl<'a, R: ReconstructingReducerExpression<'a>> ReconstructingDirector<'a, R> {
 
     pub fn reduce_expression(&mut self, input: &'a Expression<'a>) -> &'a Expression<'a> {
         let value = match input.clone() {
+            Expression::Err(e) => self.reduce_err(e),
             Expression::ArrayAccess(e) => self.reduce_array_access(e),
             Expression::ArrayInit(e) => self.reduce_array_init(e),
             Expression::ArrayInline(e) => self.reduce_array_inline(e),
@@ -73,6 +74,10 @@ impl<'a, R: ReconstructingReducerExpression<'a>> ReconstructingDirector<'a, R> {
             variable.references.push(allocated);
         }
         allocated
+    }
+
+    pub fn reduce_err(&mut self, input: ErrExpression<'a>) -> Expression<'a> {
+        self.reducer.reduce_err(input)
     }
 
     pub fn reduce_array_access(&mut self, input: ArrayAccessExpression<'a>) -> Expression<'a> {

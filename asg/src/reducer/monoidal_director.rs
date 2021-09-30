@@ -38,6 +38,7 @@ impl<'a, T: Monoid, R: MonoidalReducerExpression<'a, T>> MonoidalDirector<'a, T,
 
     pub fn reduce_expression(&mut self, input: &'a Expression<'a>) -> T {
         let value = match input {
+            Expression::Err(e) => self.reduce_err(e),
             Expression::ArrayAccess(e) => self.reduce_array_access(e),
             Expression::ArrayInit(e) => self.reduce_array_init(e),
             Expression::ArrayInline(e) => self.reduce_array_inline(e),
@@ -57,6 +58,10 @@ impl<'a, T: Monoid, R: MonoidalReducerExpression<'a, T>> MonoidalDirector<'a, T,
         };
 
         self.reducer.reduce_expression(input, value)
+    }
+
+    pub fn reduce_err(&mut self, input: &ErrExpression<'a>) -> T {
+        self.reducer.reduce_err(input)
     }
 
     pub fn reduce_array_access(&mut self, input: &ArrayAccessExpression<'a>) -> T {

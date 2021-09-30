@@ -67,6 +67,7 @@ impl<'a, R: ExpressionVisitor<'a>> VisitorDirector<'a, R> {
                 Expression::TupleInit(e) => self.visit_tuple_init(e),
                 Expression::Unary(e) => self.visit_unary(e),
                 Expression::VariableRef(e) => self.visit_variable_ref(e),
+                Expression::Err(e) => self.visit_err(e),
             },
             x => x.into(),
         }
@@ -81,6 +82,10 @@ impl<'a, R: ExpressionVisitor<'a>> VisitorDirector<'a, R> {
         } else {
             Ok(())
         }
+    }
+
+    fn visit_err(&mut self, input: &ErrExpression<'a>) -> ConcreteVisitResult {
+        self.visitor.visit_err(input).into()
     }
 
     pub fn visit_array_access(&mut self, input: &ArrayAccessExpression<'a>) -> ConcreteVisitResult {
