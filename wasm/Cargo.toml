@@ -21,6 +21,11 @@ license = "GPL-3.0"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[dependencies.leo-compiler]
+version = "1.5.3"
+path = "../compiler"
+features = [ "wasm" ]
+
 [dependencies.leo-parser]
 version = "1.5.3"
 path = "../parser"

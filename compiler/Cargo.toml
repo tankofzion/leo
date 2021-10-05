@@ -75,6 +75,9 @@ default-features = false
 [dependencies.snarkvm-dpc]
 version = "0.7.9"
 default-features = false
+# git = "https://github.com/AleoHQ/snarkVM" 
+# branch = "parameters_wasm" 
+# version = "0.7.5"
 
 [dependencies.snarkvm-gadgets]
 version = "0.7.8"
@@ -125,8 +128,12 @@ version = "0.3"
 default-features = false
 
 [dev-dependencies.snarkvm-algorithms]
-version = "0.7.6"
+# version = "0.7.6"
 default-features = false
+git = "https://github.com/AleoHQ/snarkVM" 
+branch = "parameters_wasm" 
+version = "0.7.5"
+
 
 [dev-dependencies.tempfile]
 version = "3.0.4"
@@ -141,3 +148,4 @@ version = "1.4.0"
 [features]
 default = [ ]
 ci_skip = [ "leo-ast/ci_skip" ]
+wasm = [ "snarkvm-dpc/wasm", "leo-state/wasm" ]

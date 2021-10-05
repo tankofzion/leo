@@ -20,6 +20,7 @@
 use leo_ast::AstPass;
 use leo_errors::LeoError;
 
+use leo_compiler::*;
 use serde_json::json;
 use wasm_bindgen::prelude::*;
 
