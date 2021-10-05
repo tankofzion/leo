@@ -17,6 +17,7 @@
 #![doc = include_str!("../README.md")]
 
 use leo_ast::Program;
+use leo_errors::emitter::Handler;
 use leo_errors::{ImportError, Result};
 
 #[macro_use]
@@ -27,26 +28,26 @@ use indexmap::IndexMap;
 
 static STDLIB: Dir = include_dir!(".");
 
-fn resolve_file(file: &str, mapping: Option<&str>) -> Result<Program> {
+fn resolve_file(handler: &Handler, file: &str, mapping: Option<&str>) -> Result<Program> {
     let resolved = STDLIB
         .get_file(&file)
         .ok_or_else(|| ImportError::no_such_stdlib_file(file))?
         .contents_utf8()
         .ok_or_else(|| ImportError::failed_to_read_stdlib_file(file))?;
 
-    let ast = leo_parser::parse_ast(&file, resolved)?.into_repr();
+    let ast = leo_parser::parse_ast(handler, &file, resolved)?.into_repr();
     ast.set_core_mapping(mapping);
 
     Ok(ast)
 }
 
-pub fn resolve_prelude_modules() -> Result<IndexMap<Vec<String>, Program>> {
+pub fn resolve_prelude_modules(handler: &Handler) -> Result<IndexMap<Vec<String>, Program>> {
     let mut preludes: IndexMap<Vec<String>, Program> = IndexMap::new();
 
     for module in STDLIB.find("prelude/*.leo").unwrap() {
         // If on windows repalce \\ with / as all paths are stored in unix style.
         let path = module.path().to_str().unwrap_or("").replace("\\", "/");
-        let program = resolve_file(&path, None)?;
+        let program = resolve_file(handler, &path, None)?;
 
         let removed_extension = path.replace(".leo", "");
         let mut parts: Vec<String> = vec![String::from("std")];
@@ -62,7 +63,7 @@ pub fn resolve_prelude_modules() -> Result<IndexMap<Vec<String>, Program>> {
     Ok(preludes)
 }
 
-pub fn resolve_stdlib_module(module: &str) -> Result<Program> {
+pub fn resolve_stdlib_module(handler: &Handler, module: &str) -> Result<Program> {
     let mut file_path = module.replace(".", "/");
     file_path.push_str(".leo");
 
@@ -72,5 +73,5 @@ pub fn resolve_stdlib_module(module: &str) -> Result<Program> {
         None
     };
 
-    resolve_file(&file_path, mapping)
+    resolve_file(handler, &file_path, mapping)
 }

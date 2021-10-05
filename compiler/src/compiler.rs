@@ -22,7 +22,7 @@ use crate::{
 pub use leo_asg::{new_context, AsgContext as Context, AsgContext};
 use leo_asg::{Asg, AsgPass, Program as AsgProgram};
 use leo_ast::{AstPass, Input, MainInput, Program as AstProgram};
-use leo_errors::{CompilerError, Result};
+use leo_errors::{emitter::Handler, CompilerError, Result};
 use leo_imports::ImportParser;
 use leo_input::LeoInputParser;
 use leo_package::inputs::InputPairs;
@@ -56,7 +56,8 @@ pub fn thread_leaked_context() -> AsgContext<'static> {
 
 /// Stores information to compile a Leo program.
 #[derive(Clone)]
-pub struct Compiler<'a, F: PrimeField, G: GroupType<F>> {
+pub struct Compiler<'a, 'b, F: PrimeField, G: GroupType<F>> {
+    handler: &'b Handler,
     program_name: String,
     main_file_path: PathBuf,
     output_directory: PathBuf,
@@ -71,11 +72,10 @@ pub struct Compiler<'a, F: PrimeField, G: GroupType<F>> {
     _group: PhantomData<G>,
 }
 
-impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
-    ///
+impl<'a, 'b, F: PrimeField, G: GroupType<F>> Compiler<'a, 'b, F, G> {
     /// Returns a new Leo program compiler.
-    ///
     pub fn new(
+        handler: &'b Handler,
         package_name: String,
         main_file_path: PathBuf,
         output_directory: PathBuf,
@@ -85,6 +85,7 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         ast_snapshot_options: Option<AstSnapshotOptions>,
     ) -> Self {
         Self {
+            handler,
             program_name: package_name.clone(),
             main_file_path,
             output_directory,
@@ -100,7 +101,6 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         }
     }
 
-    ///
     /// Returns a new `Compiler` from the given main file path.
     ///
     /// Parses and stores a program from the main file path.
@@ -108,6 +108,7 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
     /// Performs type inference checking on the program and imported programs.
     ///
     pub fn parse_program_without_input(
+        handler: &'b Handler,
         package_name: String,
         main_file_path: PathBuf,
         output_directory: PathBuf,
@@ -117,6 +118,7 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         ast_snapshot_options: Option<AstSnapshotOptions>,
     ) -> Result<Self> {
         let mut compiler = Self::new(
+            handler,
             package_name,
             main_file_path,
             output_directory,
@@ -135,16 +137,15 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         self.options = options;
     }
 
-    ///
     /// Returns a new `Compiler` from the given main file path.
     ///
     /// Parses and stores program input from from the input file path and state file path
     /// Parses and stores a program from the main file path.
     /// Parses and stores all imported programs.
     /// Performs type inference checking on the program, imported programs, and program input.
-    ///
     #[allow(clippy::too_many_arguments)]
     pub fn parse_program_with_input(
+        handler: &'b Handler,
         package_name: String,
         main_file_path: PathBuf,
         output_directory: PathBuf,
@@ -158,6 +159,7 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         ast_snapshot_options: Option<AstSnapshotOptions>,
     ) -> Result<Self> {
         let mut compiler = Self::new(
+            handler,
             package_name,
             main_file_path,
             output_directory,
@@ -174,11 +176,9 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         Ok(compiler)
     }
 
-    ///
     /// Parses and stores program input from from the input file path and state file path
     ///
     /// Calls `set_path()` on compiler errors with the given input file path or state file path
-    ///
     pub fn parse_input(
         &mut self,
         input_string: &str,
@@ -223,11 +223,9 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         Ok(())
     }
 
-    ///
     /// Parses and stores the main program file, constructs a syntax tree, and generates a program.
     ///
     /// Parses and stores all programs imported by the main program file.
-    ///
     pub fn parse_program(&mut self) -> Result<()> {
         // Load the program file.
         let content = fs::read_to_string(&self.main_file_path)
@@ -236,14 +234,16 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         self.parse_program_from_string(&content)
     }
 
-    ///
     /// Equivalent to parse_and_check_program but uses the given program_string instead of a main
     /// file path.
-    ///
     pub fn parse_program_from_string(&mut self, program_string: &str) -> Result<()> {
         // Use the parser to construct the abstract syntax tree (ast).
 
-        let mut ast: leo_ast::Ast = parse_ast(self.main_file_path.to_str().unwrap_or_default(), program_string)?;
+        let mut ast: leo_ast::Ast = parse_ast(
+            self.handler,
+            self.main_file_path.to_str().unwrap_or_default(),
+            program_string,
+        )?;
 
         if self.ast_snapshot_options.initial {
             if self.ast_snapshot_options.spans_enabled {
@@ -255,8 +255,9 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
 
         // Preform import resolution.
         ast = leo_ast_passes::Importer::do_pass(
+            self.handler,
             ast.into_repr(),
-            &mut ImportParser::new(self.main_file_path.clone(), self.imports_map.clone()),
+            &mut ImportParser::new(self.handler, self.main_file_path.clone(), self.imports_map.clone()),
         )?;
 
         if self.ast_snapshot_options.imports_resolved {
@@ -313,9 +314,7 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         Ok(())
     }
 
-    ///
     /// Run compiler optimization passes on the program in asg format.
-    ///
     fn do_asg_passes(&mut self) -> Result<()> {
         assert!(self.asg.is_some());
 
@@ -334,23 +333,17 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
         Ok(())
     }
 
-    ///
     /// Synthesizes the circuit with program input to verify correctness.
-    ///
     pub fn compile_constraints<CS: ConstraintSystem<F>>(&self, cs: &mut CS) -> Result<Output> {
         generate_constraints::<F, G, CS>(cs, self.asg.as_ref().unwrap(), &self.program_input)
     }
 
-    ///
     /// Synthesizes the circuit for test functions with program input.
-    ///
     pub fn compile_test_constraints(self, input_pairs: InputPairs) -> Result<(u32, u32)> {
         generate_test_constraints::<F, G>(self.asg.as_ref().unwrap(), input_pairs, &self.output_directory)
     }
 
-    ///
     /// Returns a SHA256 checksum of the program file.
-    ///
     pub fn checksum(&self) -> Result<String> {
         // Read in the main file as string
         let unparsed_file = fs::read_to_string(&self.main_file_path)
@@ -368,27 +361,22 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
     ///  test executions. Exclude it for test executions on dummy data.
     ///
     /// Verifies the input to the program.
-    ///
     pub fn verify_local_data_commitment(&self, system_parameters: &SystemParameters<Components>) -> Result<bool> {
         let result = verify_local_data_commitment(system_parameters, &self.program_input)?;
 
         Ok(result)
     }
 
-    ///
     /// Manually sets main function input.
     ///
     /// Used for testing only.
-    ///
     pub fn set_main_input(&mut self, input: MainInput) {
         self.program_input.set_main_input(input);
     }
 }
 
-impl<'a, F: PrimeField, G: GroupType<F>> ConstraintSynthesizer<F> for Compiler<'a, F, G> {
-    ///
+impl<F: PrimeField, G: GroupType<F>> ConstraintSynthesizer<F> for Compiler<'_, '_, F, G> {
     /// Synthesizes the circuit with program input.
-    ///
     fn generate_constraints<CS: ConstraintSystem<F>>(&self, cs: &mut CS) -> Result<(), SynthesisError> {
         let output_directory = self.output_directory.clone();
         let package_name = self.program_name.clone();

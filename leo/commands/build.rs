@@ -103,19 +103,19 @@ pub struct Build {
     pub(crate) compiler_options: BuildOptions,
 }
 
-impl Command for Build {
+impl<'a> Command<'a> for Build {
     type Input = ();
-    type Output = (Compiler<'static, Fq, EdwardsGroupType>, bool);
+    type Output = (Compiler<'static, 'a, Fq, EdwardsGroupType>, bool);
 
     fn log_span(&self) -> Span {
         tracing::span!(tracing::Level::INFO, "Build")
     }
 
-    fn prelude(&self, _: Context) -> Result<Self::Input> {
+    fn prelude(&self, _: Context<'a>) -> Result<Self::Input> {
         Ok(())
     }
 
-    fn apply(self, context: Context, _: Self::Input) -> Result<Self::Output> {
+    fn apply(self, context: Context<'a>, _: Self::Input) -> Result<Self::Output> {
         let path = context.dir()?;
         let manifest = context.manifest().map_err(|_| CliError::manifest_file_not_found())?;
         let package_name = manifest.get_package_name();
@@ -168,6 +168,7 @@ impl Command for Build {
 
         // Load the program at `main_file_path`
         let program = Compiler::<Fq, EdwardsGroupType>::parse_program_with_input(
+            context.handler,
             package_name.clone(),
             main_file_path,
             output_directory,

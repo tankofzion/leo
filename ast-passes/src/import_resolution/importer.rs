@@ -17,6 +17,7 @@
 use crate::resolver::*;
 
 use leo_ast::*;
+use leo_errors::emitter::Handler;
 use leo_errors::{AstError, Result, Span};
 
 use indexmap::IndexMap;
@@ -24,12 +25,9 @@ use indexmap::IndexMap;
 pub struct Importer {}
 
 impl Importer {
-    pub fn do_pass<T>(program: Program, importer: &mut T) -> Result<Ast>
-    where
-        T: ImportResolver,
-    {
+    pub fn do_pass<T: ImportResolver>(handler: &Handler, program: Program, importer: &mut T) -> Result<Ast> {
         let mut ast = program.clone();
-        ast.imports.extend(leo_stdlib::resolve_prelude_modules()?);
+        ast.imports.extend(leo_stdlib::resolve_prelude_modules(handler)?);
 
         let mut imported_symbols: Vec<(Vec<String>, ImportSymbol, Span)> = vec![];
         for import_statement in program.import_statements.iter() {

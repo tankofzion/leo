@@ -20,6 +20,7 @@ use std::{
 };
 
 use leo_asg::*;
+use leo_errors::emitter::Handler;
 use leo_errors::Result;
 
 use leo_synthesizer::{CircuitSynthesizer, SerializedCircuit, SummarizedCircuit};
@@ -33,7 +34,7 @@ use snarkvm_curves::{bls12_377::Bls12_377, edwards_bls12::Fq};
 use crate::{compiler::Compiler, targets::edwards_bls12::EdwardsGroupType, AstSnapshotOptions, Output};
 use indexmap::IndexMap;
 
-pub type EdwardsTestCompiler = Compiler<'static, Fq, EdwardsGroupType>;
+pub type EdwardsTestCompiler<'a> = Compiler<'static, 'a, Fq, EdwardsGroupType>;
 // pub type EdwardsConstrainedValue = ConstrainedValue<'static, Fq, EdwardsGroupType>;
 
 //convenience function for tests, leaks memory
@@ -42,12 +43,17 @@ pub(crate) fn make_test_context() -> AsgContext<'static> {
     new_context(allocator)
 }
 
-fn new_compiler(path: PathBuf, theorem_options: Option<AstSnapshotOptions>) -> EdwardsTestCompiler {
+fn new_compiler(
+    handler: &Handler,
+    path: PathBuf,
+    theorem_options: Option<AstSnapshotOptions>,
+) -> EdwardsTestCompiler<'_> {
     let program_name = "test".to_string();
     let output_dir = PathBuf::from("/tmp/output/");
     fs::create_dir_all(output_dir.clone()).unwrap();
 
     EdwardsTestCompiler::new(
+        handler,
         program_name,
         path,
         output_dir,
@@ -68,12 +74,13 @@ fn hash_file(path: &str) -> String {
     format!("{:x}", hash)
 }
 
-pub(crate) fn parse_program(
+pub(crate) fn parse_program<'a>(
+    handler: &'a Handler,
     program_string: &str,
     theorem_options: Option<AstSnapshotOptions>,
     cwd: Option<PathBuf>,
-) -> Result<EdwardsTestCompiler> {
-    let mut compiler = new_compiler(cwd.unwrap_or_else(|| "compiler-test".into()), theorem_options);
+) -> Result<EdwardsTestCompiler<'a>> {
+    let mut compiler = new_compiler(handler, cwd.unwrap_or_else(|| "compiler-test".into()), theorem_options);
 
     compiler.parse_program_from_string(program_string)?;
 
@@ -115,7 +122,9 @@ impl Namespace for CompileNamespace {
         });
         // .unwrap_or(test.path.clone());
 
+        let handler = Handler::default();
         let parsed = parse_program(
+            &handler,
             &test.content,
             Some(AstSnapshotOptions {
                 spans_enabled: false,

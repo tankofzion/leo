@@ -44,7 +44,7 @@ pub struct Test {
     pub(crate) compiler_options: BuildOptions,
 }
 
-impl Command for Test {
+impl<'a> Command<'a> for Test {
     type Input = ();
     type Output = ();
 
@@ -52,11 +52,11 @@ impl Command for Test {
         tracing::span!(tracing::Level::INFO, "Test")
     }
 
-    fn prelude(&self, _: Context) -> Result<Self::Input> {
+    fn prelude(&self, _: Context<'a>) -> Result<Self::Input> {
         Ok(())
     }
 
-    fn apply(self, context: Context, _: Self::Input) -> Result<Self::Output> {
+    fn apply(self, context: Context<'a>, _: Self::Input) -> Result<Self::Output> {
         // Get the package name
         let package_name = context.manifest()?.get_package_name();
 
@@ -105,6 +105,7 @@ impl Command for Test {
 
             let timer = Instant::now();
             let program = Compiler::<Fq, EdwardsGroupType>::parse_program_without_input(
+                context.handler,
                 package_name.clone(),
                 file_path,
                 output_directory.clone(),
