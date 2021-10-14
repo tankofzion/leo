@@ -46,7 +46,6 @@ use std::io::Write;
 use std::{convert::TryFrom, fs, path::PathBuf};
 
 use indexmap::IndexMap;
-use std::borrow::Borrow;
 
 thread_local! {
     static THREAD_GLOBAL_CONTEXT: AsgContext<'static> = {
@@ -244,10 +243,14 @@ impl<'a> Compiler<'a> {
         assert!(self.asg.is_some());
 
         if self.snapshot_options.initial_asg {
-            let asg = self.asg.take().unwrap();
             let mut path = self.output_directory.clone();
             path.push("initial_asg.dot");
-            self.asg = Some(leo_asg_passes::Dotify::do_pass((asg, "initial-asg".to_string(), path))?);
+            self.asg = Some(leo_asg_passes::Dotify::do_pass((
+                self.asg.take().unwrap(),
+                &self.context,
+                "initial_asg".to_string(),
+                path,
+            ))?);
         }
 
         // Do constant folding.
@@ -255,9 +258,15 @@ impl<'a> Compiler<'a> {
             let asg = self.asg.take().unwrap();
             self.asg = Some(leo_asg_passes::ConstantFolding::do_pass((asg, &self.context))?);
 
-            if self.output_options.asg_constants_folded {
-                //TODO
-                panic!("ASG snapshot not implemented yet");
+            if self.snapshot_options.constants_folded {
+                let mut path = self.output_directory.clone();
+                path.push("constants_folded_asg.dot");
+                self.asg = Some(leo_asg_passes::Dotify::do_pass((
+                    self.asg.take().unwrap(),
+                    &self.context,
+                    "constants_folded_asg".to_string(),
+                    path,
+                ))?);
             }
         }
 
@@ -266,9 +275,15 @@ impl<'a> Compiler<'a> {
             let asg = self.asg.take().unwrap();
             self.asg = Some(leo_asg_passes::DeadCodeElimination::do_pass(asg)?);
 
-            if self.output_options.asg_dead_code_eliminated {
-                // TODO
-                panic!("ASG snapshot not implmented yet");
+            if self.output_options.dead_code_eliminated {
+                let mut path = self.output_directory.clone();
+                path.push("dead_code_eliminated.dot");
+                self.asg = Some(leo_asg_passes::Dotify::do_pass((
+                    self.asg.take().unwrap(),
+                    &self.context,
+                    "dead_code_eliminated_asg".to_string(),
+                    path,
+                ))?);
             }
         }
 
