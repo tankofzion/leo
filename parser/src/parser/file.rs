@@ -41,6 +41,7 @@ impl ParserContext<'_> {
                     import_statements.push(self.parse_import_statement()?);
                 }
                 Token::Circuit => {
+                    self.expect(Token::Circuit)?;
                     let (id, circuit) = self.parse_circuit()?;
                     circuits.insert(id, circuit);
                 }
@@ -48,9 +49,17 @@ impl ParserContext<'_> {
                     let (id, function) = self.parse_function_declaration()?;
                     functions.insert(id, function);
                 }
-                Token::Ident(ident) if ident.as_ref() == "test" => {
-                    return Err(ParserError::test_function(&token.span).into());
-                }
+                Token::Ident(ident) => match ident.as_ref() {
+                    "test" => return Err(ParserError::test_function(&token.span).into()),
+                    kw @ ("struct" | "class") => {
+                        self.handler
+                            .emit_err(&ParserError::unexpected(kw, "circuit", &token.span).into());
+                        self.bump().unwrap();
+                        let (id, circuit) = self.parse_circuit()?;
+                        circuits.insert(id, circuit);
+                    }
+                    _ => return Err(Self::unexpected_item(token).into()),
+                },
                 Token::Const => {
                     let (name, global_const) = self.parse_global_const_declaration()?;
                     global_consts.insert(name, global_const);
@@ -59,24 +68,7 @@ impl ParserContext<'_> {
                     let (name, alias) = self.parse_type_alias()?;
                     aliases.insert(name, alias);
                 }
-                _ => {
-                    return Err(ParserError::unexpected(
-                        &token.token,
-                        [
-                            Token::Import,
-                            Token::Circuit,
-                            Token::Function,
-                            Token::Ident("test".into()),
-                            Token::At,
-                        ]
-                        .iter()
-                        .map(|x| format!("'{}'", x))
-                        .collect::<Vec<_>>()
-                        .join(", "),
-                        &token.span,
-                    )
-                    .into());
-                }
+                _ => return Err(Self::unexpected_item(token).into()),
             }
         }
         Ok(Program {
@@ -89,6 +81,24 @@ impl ParserContext<'_> {
             functions,
             global_consts,
         })
+    }
+
+    fn unexpected_item(token: &SpannedToken) -> ParserError {
+        ParserError::unexpected(
+            &token.token,
+            [
+                Token::Import,
+                Token::Circuit,
+                Token::Function,
+                Token::Ident("test".into()),
+                Token::At,
+            ]
+            .iter()
+            .map(|x| format!("'{}'", x))
+            .collect::<Vec<_>>()
+            .join(", "),
+            &token.span,
+        )
     }
 
     ///
@@ -403,7 +413,6 @@ impl ParserContext<'_> {
     /// circuit name and definition statement.
     ///
     pub fn parse_circuit(&mut self) -> Result<(Identifier, Circuit)> {
-        self.expect(Token::Circuit)?;
         let name = self.expect_ident()?;
         self.expect(Token::LeftCurly)?;
         let members = self.parse_circuit_declaration()?;
