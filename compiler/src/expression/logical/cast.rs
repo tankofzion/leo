@@ -16,14 +16,23 @@
 
 //! Methods to enforce logical expressions in a compiled Leo program.
 
-pub mod and;
-pub use self::and::*;
+use crate::Program;
+use leo_asg::CastExpression;
+use leo_errors::Result;
+use snarkvm_ir::{CastData, Instruction, Value};
 
-pub mod cast;
-pub use self::cast::*;
+impl<'a> Program<'a> {
+    pub fn enforce_cast(&mut self, cast: &'a CastExpression<'a>) -> Result<Value> {
+        let inner = self.enforce_expression(cast.inner.get())?;
 
-pub mod not;
-pub use self::not::*;
+        let output = self.alloc();
 
-pub mod or;
-pub use self::or::*;
+        let type_ = Value::Str(dbg!(cast.target_type.to_string()));
+
+        self.emit(Instruction::Cast(CastData {
+            destination: output,
+            arguments: vec![inner, type_],
+        }));
+        Ok(Value::Ref(output))
+    }
+}

@@ -55,14 +55,14 @@ impl<'a> ExpressionNode<'a> for CastExpression<'a> {
         false
     }
 
-    fn const_value(&self) -> Option<ConstValue> {
+    fn const_value(&self) -> Result<Option<ConstValue>> {
         let value = self.inner.get().const_value()?;
         match value {
-            ConstValue::Int(int) => match &self.target_type {
-                Type::Integer(target) => Some(ConstValue::Int(int.cast_to(target))),
-                _ => None,
+            Some(ConstValue::Int(int)) => match &self.target_type {
+                Type::Integer(target) => Ok(Some(ConstValue::Int(int.cast_to(target, &self.span.unwrap())?))),
+                _ => Ok(None),
             },
-            _ => None,
+            _ => Ok(None),
         }
     }
 
@@ -84,7 +84,17 @@ impl<'a> FromAst<'a, leo_ast::CastExpression> for CastExpression<'a> {
             }
         }
 
+        match target_type {
+            Type::Integer(_) => {}
+            _ => return Err(AsgError::casting_as_illegal_type(target_type, &value.span).into()),
+        }
+
         let inner = <&Expression<'a>>::from_ast(scope, &*value.inner, None)?;
+
+        match inner.get_type() {
+            Some(Type::Integer(_)) => {}
+            _ => return Err(AsgError::casting_from_illegal_type(target_type, &value.span).into()),
+        }
 
         Ok(CastExpression {
             parent: Cell::new(None),

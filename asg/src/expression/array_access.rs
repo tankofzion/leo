@@ -59,19 +59,19 @@ impl<'a> ExpressionNode<'a> for ArrayAccessExpression<'a> {
         self.array.get().is_mut_ref()
     }
 
-    fn const_value(&self) -> Option<ConstValue<'a>> {
+    fn const_value(&self) -> Result<Option<ConstValue<'a>>> {
         let mut array = match self.array.get().const_value()? {
-            ConstValue::Array(values) => values,
-            _ => return None,
+            Some(ConstValue::Array(values)) => values,
+            _ => return Ok(None),
         };
-        let const_index = match self.index.get().const_value()? {
-            ConstValue::Int(x) => x.to_usize()?,
-            _ => return None,
+        let const_index: usize = match self.index.get().const_value()? {
+            Some(ConstValue::Int(x)) => x.to_usize(&self.span.unwrap())?,
+            _ => return Ok(None),
         };
         if const_index >= array.len() {
-            return None;
+            return Ok(None);
         }
-        Some(array.remove(const_index))
+        Ok(Some(array.remove(const_index)))
     }
 
     fn is_consty(&self) -> bool {

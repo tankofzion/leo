@@ -71,18 +71,18 @@ impl<'a> ExpressionNode<'a> for ArrayRangeAccessExpression<'a> {
         self.array.get().is_mut_ref()
     }
 
-    fn const_value(&self) -> Option<ConstValue<'a>> {
+    fn const_value(&self) -> Result<Option<ConstValue<'a>>> {
         let mut array = match self.array.get().const_value()? {
-            ConstValue::Array(values) => values,
-            _ => return None,
+            Some(ConstValue::Array(values)) => values,
+            _ => return Ok(None),
         };
         let const_left = match self.left.get().map(|x| x.const_value()) {
-            Some(Some(ConstValue::Int(x))) => x.to_usize()?,
+            Some(Ok(Some(ConstValue::Int(x)))) => x.to_usize(),
             None => 0,
-            _ => return None,
+            _ => return Ok(None),
         };
         let const_right = match self.right.get().map(|x| x.const_value()) {
-            Some(Some(ConstValue::Int(x))) => x.to_usize()?,
+            Some(Ok(Some(ConstValue::Int(x)))) => x.to_usize(),
             None => array.len(),
             _ => return None,
         };

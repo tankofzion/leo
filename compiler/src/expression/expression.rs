@@ -128,7 +128,7 @@ impl<'a> Program<'a> {
         let span = &expression.span().cloned().unwrap_or_default();
         match expression {
             // Cast
-            Expression::Cast(_) => unimplemented!("casts not implemented"),
+            Expression::Cast(cast) => self.enforce_cast(cast),
 
             // LengthOf
             Expression::LengthOf(lengthof) => self.enforce_lengthof(lengthof),

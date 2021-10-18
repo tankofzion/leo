@@ -54,9 +54,11 @@ impl<'a> ExpressionNode<'a> for ArrayInitExpression<'a> {
         false
     }
 
-    fn const_value(&self) -> Option<ConstValue<'a>> {
-        let element = self.element.get().const_value()?;
-        Some(ConstValue::Array(vec![element; self.len as usize]))
+    fn const_value(&self) -> Result<Option<ConstValue<'a>>> {
+        if let Some(element) = self.element.get().const_value()? {
+            return Ok(Some(ConstValue::Array(vec![element; self.len as usize])));
+        }
+        Ok(None)
     }
 
     fn is_consty(&self) -> bool {

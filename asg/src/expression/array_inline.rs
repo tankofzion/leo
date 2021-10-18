@@ -79,19 +79,22 @@ impl<'a> ExpressionNode<'a> for ArrayInlineExpression<'a> {
         false
     }
 
-    fn const_value(&self) -> Option<ConstValue<'a>> {
+    fn const_value(&self) -> Result<Option<ConstValue<'a>>> {
         let mut const_values = vec![];
         for (expr, spread) in self.elements.iter() {
             if *spread {
                 match expr.get().const_value()? {
-                    ConstValue::Array(items) => const_values.extend(items),
-                    _ => return None,
+                    Some(ConstValue::Array(items)) => const_values.extend(items),
+                    _ => return Ok(None),
                 }
             } else {
-                const_values.push(expr.get().const_value()?);
+                if let Some(cv) = expr.get().const_value()? {
+                    const_values.push(cv);
+                }
+                return Ok(None);
             }
         }
-        Some(ConstValue::Array(const_values))
+        Ok(Some(ConstValue::Array(const_values)))
     }
 
     fn is_consty(&self) -> bool {
