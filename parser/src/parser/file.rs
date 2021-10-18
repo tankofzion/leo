@@ -46,7 +46,9 @@ impl ParserContext {
                 }
                 Token::Function | Token::At => {
                     let (id, function) = self.parse_function_declaration()?;
+                    eprintln!("Token to Function: {}", &id);
                     functions.insert(id, function);
+                    eprintln!("Functions length after adding: {}", functions.len());
                 }
                 Token::Ident(ident) if ident.as_ref() == "test" => {
                     return Err(ParserError::test_function(&token.span).into());
@@ -79,6 +81,9 @@ impl ParserContext {
                 }
             }
         }
+
+        eprintln!("Result after parsing is (func num): {}", functions.len());
+
         Ok(Program {
             name: String::new(),
             expected_input: Vec::new(),

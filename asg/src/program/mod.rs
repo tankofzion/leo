@@ -145,10 +145,13 @@ fn check_top_level_namespaces<'a>(
     } else if global_consts.contains_key(name) {
         Err(AsgError::duplicate_global_const_definition(name, span).into())
     } else if functions.contains_key(name) {
+        eprintln!("{} {:?}", name, functions.keys().collect::<Vec<&String>>());
         Err(AsgError::duplicate_function_definition(name, span).into())
     } else if circuits.contains_key(name) {
         Err(AsgError::duplicate_circuit_definition(name, span).into())
     } else {
+        eprintln!("{} {:?}", name, functions.keys().collect::<Vec<&String>>());
+
         Ok(())
     }
 }
@@ -332,7 +335,11 @@ impl<'a> Program<'a> {
             aliases.insert(name, asg_alias);
         }
 
-        for (name, function) in program.functions.iter() {
+        eprintln!("ASG number of functions is: {}", program.functions.len());
+
+        for (id, (name, function)) in program.functions.iter().enumerate() {
+            eprintln!("Function num: {}, name: {}", id, name);
+
             assert_eq!(name.name, function.identifier.name);
             let asg_function = *scope.functions.borrow().get(name.name.as_ref()).unwrap();
 

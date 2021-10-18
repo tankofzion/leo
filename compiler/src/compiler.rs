@@ -253,11 +253,21 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
             }
         }
 
+        eprintln!(
+            "AST Initial number of functions is: {}",
+            ast.clone().into_repr().functions.len()
+        );
+
         // Preform import resolution.
         ast = leo_ast_passes::Importer::do_pass(
             ast.into_repr(),
             &mut ImportParser::new(self.main_file_path.clone(), self.imports_map.clone()),
         )?;
+
+        eprintln!(
+            "AST Importer number of functions is: {}",
+            ast.clone().into_repr().functions.len()
+        );
 
         if self.ast_snapshot_options.imports_resolved {
             if self.ast_snapshot_options.spans_enabled {
@@ -277,6 +287,11 @@ impl<'a, F: PrimeField, G: GroupType<F>> Compiler<'a, F, G> {
                 ast.to_json_file_without_keys(self.output_directory.clone(), "canonicalization_ast.json", &["span"])?;
             }
         }
+
+        eprintln!(
+            "AST Canonicalized number of functions is: {}",
+            ast.clone().into_repr().functions.len()
+        );
 
         // Store the main program file.
         self.program = ast.into_repr();

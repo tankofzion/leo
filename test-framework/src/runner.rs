@@ -47,6 +47,8 @@ pub trait Runner {
 }
 
 pub fn run_tests<T: Runner>(runner: &T, expectation_category: &str) {
+    eprintln!("\n\nRUNNING TEST\n\n");
+
     std::env::remove_var("LEO_BACKTRACE"); // always remove backtrace so it doesn't clog output files
     std::env::set_var("LEO_TESTFRAMEWORK", "true");
     let mut pass_categories = 0;
