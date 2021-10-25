@@ -65,7 +65,7 @@ impl<'a> ExpressionNode<'a> for ArrayAccessExpression<'a> {
             _ => return Ok(None),
         };
         let const_index: usize = match self.index.get().const_value()? {
-            Some(ConstValue::Int(x)) => x.to_usize(&self.span.unwrap())?,
+            Some(ConstValue::Int(x)) => x.to_usize(&self.span.as_ref().cloned().unwrap_or_default())?,
             _ => return Ok(None),
         };
         if const_index >= array.len() {
@@ -111,7 +111,7 @@ impl<'a> FromAst<'a, leo_ast::ArrayAccessExpression> for ArrayAccessExpression<'
 
         if let Some(index) = index
             .const_value()?
-            .map(|x| x.int().map(|x| x.to_usize(value.index.span)).transpose())
+            .map(|x| x.int().map(|x| x.to_usize(&value.span)).transpose())
             .transpose()?.flatten()
         {
             // Only check index if array size is known.

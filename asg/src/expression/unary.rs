@@ -57,6 +57,7 @@ impl<'a> ExpressionNode<'a> for UnaryExpression<'a> {
 
     fn const_value(&self) -> Result<Option<ConstValue>> {
         if let Some(inner) = self.inner.get().const_value()? {
+            let span = self.span().cloned().unwrap_or_default();
             match self.operation {
                 UnaryOperation::Not => match inner {
                     ConstValue::Boolean(value) => Ok(Some(ConstValue::Boolean(!value))),
@@ -64,14 +65,14 @@ impl<'a> ExpressionNode<'a> for UnaryExpression<'a> {
                 },
                 UnaryOperation::Negate => {
                     match inner {
-                        ConstValue::Int(value) => Ok(value.value_negate(self.span().unwrap_or_default())?.map(ConstValue::Int)),
+                        ConstValue::Int(value) => Ok(value.value_negate(&span)?.map(ConstValue::Int)),
                         // ConstValue::Group(value) => Some(ConstValue::Group(value)), TODO: groups
                         // ConstValue::Field(value) => Some(ConstValue::Field(-value)),
                         _ => Ok(None),
                     }
                 }
                 UnaryOperation::BitNot => match inner {
-                    ConstValue::Int(value) => Ok(value.value_bit_negate(self.span().unwrap_or_default())?.map(ConstValue::Int)),
+                    ConstValue::Int(value) => Ok(value.value_bit_negate(&span)?.map(ConstValue::Int)),
                     _ => Ok(None),
                 },
             }

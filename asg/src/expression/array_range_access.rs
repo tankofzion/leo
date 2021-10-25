@@ -77,15 +77,15 @@ impl<'a> ExpressionNode<'a> for ArrayRangeAccessExpression<'a> {
             _ => return Ok(None),
         };
 
-        let left_span = self.left.get().map(|e| e.span()).flatten().unwrap_or_default();
+        let left_span = self.left.get().map(|e| e.span()).flatten().cloned().unwrap_or_default();
         let const_left = match self.left.get().map(|x| x.const_value()).transpose()? {
-            Some(Some(ConstValue::Int(x))) => x.to_usize(left_span)?,
+            Some(Some(ConstValue::Int(x))) => x.to_usize(&left_span)?,
             None => 0,
             _ => return Ok(None),
         };
-        let right_span = self.right.get().map(|e| e.span()).flatten().unwrap_or_default();
+        let right_span = self.right.get().map(|e| e.span()).flatten().cloned().unwrap_or_default();
         let const_right = match self.right.get().map(|x| x.const_value()).transpose()? {
-            Some(Some(ConstValue::Int(x))) => x.to_usize(right_span)?,
+            Some(Some(ConstValue::Int(x))) => x.to_usize(&right_span)?,
             None => array.len(),
             _ => return Ok(None),
         };

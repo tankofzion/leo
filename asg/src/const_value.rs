@@ -280,11 +280,12 @@ macro_rules! const_int_bimap {
     };
 }
 
-macro_rules! power {
-    ($x: ident, $y: ident) => {
+macro_rules! power_constructor {
+    ($constructor: expr, $x: ident, $y: ident, $span: expr) => {
         {
-            let pow = (*$y).try_into().map_err(|_| AsgError::binary_operation_overflows($x, "**", $y, span))?;
-            x.checked_pow(pow);
+            let pow = (*$y).try_into().map_err(|_| AsgError::binary_operation_overflows($x, "**", $y, $span))?;
+            let res = $x.checked_pow(pow).ok_or(AsgError::binary_operation_overflows($x, "**", $y, $span))?;
+            $constructor(res)
         }
     }
 }
@@ -331,7 +332,22 @@ impl ConstInt {
     const_int_bimap!(value_div, '/', x, y, x.checked_div(*y));
 
     // TODO: limited to 32 bit exponents
-    const_int_bimap!(value_pow, "**", x, y, power!(x, y));
+    // const_int_bimap!(value_pow, "**", x, y, power!(x, y)(span) );
+    pub fn value_pow(&self, other: &ConstInt, span: &Span) -> Result<Option<ConstInt>> {
+        Ok(Some(match (self, other) {
+            (ConstInt::I8(x), ConstInt::I8(y)) => power_constructor!(ConstInt::I8, x, y, span),
+            (ConstInt::I16(x), ConstInt::I16(y)) => power_constructor!(ConstInt::I16, x, y, span),
+            (ConstInt::I32(x), ConstInt::I32(y)) => power_constructor!(ConstInt::I32, x, y, span),
+            (ConstInt::I64(x), ConstInt::I64(y)) => power_constructor!(ConstInt::I64, x, y, span),
+            (ConstInt::I128(x), ConstInt::I128(y)) => power_constructor!(ConstInt::I128, x, y, span),
+            (ConstInt::U8(x), ConstInt::U8(y)) => power_constructor!(ConstInt::U8, x, y, span),
+            (ConstInt::U16(x), ConstInt::U16(y)) => power_constructor!(ConstInt::U16, x, y, span),
+            (ConstInt::U32(x), ConstInt::U32(y)) => power_constructor!(ConstInt::U32, x, y, span),
+            (ConstInt::U64(x), ConstInt::U64(y)) => power_constructor!(ConstInt::U64, x, y, span),
+            (ConstInt::U128(x), ConstInt::U128(y)) => power_constructor!(ConstInt::U128, x, y, span),
+            _ => return Ok(None),
+        }))
+    }
 
     const_int_biop!(value_lt, bool, x, y, Some(x < y));
 

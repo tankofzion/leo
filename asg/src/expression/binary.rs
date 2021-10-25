@@ -65,13 +65,14 @@ impl<'a> ExpressionNode<'a> for BinaryExpression<'a> {
         let left = self.left.get().const_value()?;
         let right = self.right.get().const_value()?;
 
+        let span = self.span.as_ref().cloned().unwrap_or_default();
         match (left, right) {
             (Some(ConstValue::Int(left)), Some(ConstValue::Int(right))) => Ok(match self.operation {
-                Add => left.value_add(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
-                Sub => left.value_sub(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
-                Mul => left.value_mul(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
-                Div => left.value_div(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
-                Pow => left.value_pow(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
+                Add => left.value_add(&right, &span)?.map(ConstValue::Int),
+                Sub => left.value_sub(&right, &span)?.map(ConstValue::Int),
+                Mul => left.value_mul(&right, &span)?.map(ConstValue::Int),
+                Div => left.value_div(&right, &span)?.map(ConstValue::Int),
+                Pow => left.value_pow(&right, &span)?.map(ConstValue::Int),
                 Eq => Some(ConstValue::Boolean(left == right)),
                 Ne => Some(ConstValue::Boolean(left != right)),
                 Ge => left.value_ge(&right)?.map(ConstValue::Boolean),

@@ -59,7 +59,7 @@ impl<'a> ExpressionNode<'a> for CastExpression<'a> {
         let value = self.inner.get().const_value()?;
         match value {
             Some(ConstValue::Int(int)) => match &self.target_type {
-                Type::Integer(target) => Ok(Some(ConstValue::Int(int.cast_to(target, &self.span.unwrap())?))),
+                Type::Integer(target) => Ok(Some(ConstValue::Int(int.cast_to(target, &self.span.as_ref().cloned().unwrap_or_default())?))),
                 _ => Ok(None),
             },
             _ => Ok(None),
