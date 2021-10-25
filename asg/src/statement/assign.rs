@@ -98,22 +98,30 @@ impl<'a> FromAst<'a, leo_ast::AssignStatement> for &'a Statement<'a> {
                         Some(PartialType::Array(item, len)) => {
                             if let (Some(left), Some(right)) = (
                                 left.as_ref()
-                                    .map(|x| x.const_value())
-                                    .unwrap_or_else(|| Some(ConstValue::Int(ConstInt::U32(0)))),
+                                    .and_then(|x| x.const_value().ok())
+                                    .flatten()
+                                    .or(Some(ConstValue::Int(ConstInt::U32(0)))),
                                 right
                                     .as_ref()
-                                    .map(|x| x.const_value())
-                                    .unwrap_or_else(|| Some(ConstValue::Int(ConstInt::U32(len.map(|x| x as u32)?)))),
+                                    .and_then(|x| {
+                                        if let Some(c) = x.const_value().ok().flatten() {
+                                            Some(c)
+                                        } else if let Some(ulen) = len.map(|x| x as u32) {
+                                            Some(ConstValue::Int(ConstInt::U32(ulen)))
+                                        } else {
+                                            None
+                                        }
+                                    })
                             ) {
                                 let left = match left {
-                                    ConstValue::Int(x) => x.to_usize().ok_or_else(|| {
-                                        AsgError::invalid_assign_index(name, x.to_string(), &statement.span)
+                                    ConstValue::Int(x) => x.to_usize(&statement.span).or_else(|_| {
+                                        Err(AsgError::invalid_assign_index(name, x.to_string(), &statement.span))
                                     })?,
                                     _ => unimplemented!(),
                                 };
                                 let right = match right {
-                                    ConstValue::Int(x) => x.to_usize().ok_or_else(|| {
-                                        AsgError::invalid_assign_index(name, x.to_string(), &statement.span)
+                                    ConstValue::Int(x) => x.to_usize(&statement.span).or_else(|_| {
+                                        Err(AsgError::invalid_assign_index(name, x.to_string(), &statement.span))
                                     })?,
                                     _ => unimplemented!(),
                                 };

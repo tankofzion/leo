@@ -56,10 +56,10 @@ impl<'a> ExpressionNode<'a> for VariableRef<'a> {
     }
 
     // todo: we can use use hacky ssa here to catch more cases, or just enforce ssa before asg generation finished
-    fn const_value(&self) -> Option<ConstValue<'a>> {
+    fn const_value(&self) -> Result<Option<ConstValue<'a>>> {
         let variable = self.variable.borrow();
         if variable.mutable || variable.assignments.len() != 1 {
-            return None;
+            return Ok(None);
         }
         let assignment = variable.assignments.get(0).unwrap();
         match &*assignment {
@@ -73,9 +73,9 @@ impl<'a> ExpressionNode<'a> for VariableRef<'a> {
                     for (i, defined_variable) in variables.iter().enumerate() {
                         let defined_variable = defined_variable.borrow();
                         if defined_variable.id == variable.id {
-                            match value.get().const_value() {
-                                Some(ConstValue::Tuple(values)) => return values.get(i).cloned(),
-                                None => return None,
+                            match value.get().const_value()? {
+                                Some(ConstValue::Tuple(values)) => return Ok(values.get(i).cloned()),
+                                None => return Ok(None),
                                 _ => (),
                             }
                         }
@@ -83,7 +83,7 @@ impl<'a> ExpressionNode<'a> for VariableRef<'a> {
                     panic!("no corresponding tuple variable found during const destructuring (corrupt asg?)");
                 }
             }
-            _ => None, //todo unroll loops during asg phase
+            _ => Ok(None), //todo unroll loops during asg phase
         }
     }
 

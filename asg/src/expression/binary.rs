@@ -60,25 +60,25 @@ impl<'a> ExpressionNode<'a> for BinaryExpression<'a> {
         false
     }
 
-    fn const_value(&self) -> Option<ConstValue> {
+    fn const_value(&self) -> Result<Option<ConstValue>> {
         use BinaryOperation::*;
         let left = self.left.get().const_value()?;
         let right = self.right.get().const_value()?;
 
         match (left, right) {
-            (ConstValue::Int(left), ConstValue::Int(right)) => Some(match self.operation {
-                Add => ConstValue::Int(left.value_add(&right)?),
-                Sub => ConstValue::Int(left.value_sub(&right)?),
-                Mul => ConstValue::Int(left.value_mul(&right)?),
-                Div => ConstValue::Int(left.value_div(&right)?),
-                Pow => ConstValue::Int(left.value_pow(&right)?),
-                Eq => ConstValue::Boolean(left == right),
-                Ne => ConstValue::Boolean(left != right),
-                Ge => ConstValue::Boolean(left.value_ge(&right)?),
-                Gt => ConstValue::Boolean(left.value_gt(&right)?),
-                Le => ConstValue::Boolean(left.value_le(&right)?),
-                Lt => ConstValue::Boolean(left.value_lt(&right)?),
-                _ => return None,
+            (Some(ConstValue::Int(left)), Some(ConstValue::Int(right))) => Ok(match self.operation {
+                Add => left.value_add(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
+                Sub => left.value_sub(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
+                Mul => left.value_mul(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
+                Div => left.value_div(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
+                Pow => left.value_pow(&right, &self.span.unwrap_or_default())?.map(ConstValue::Int),
+                Eq => Some(ConstValue::Boolean(left == right)),
+                Ne => Some(ConstValue::Boolean(left != right)),
+                Ge => left.value_ge(&right)?.map(ConstValue::Boolean),
+                Gt => left.value_gt(&right)?.map(ConstValue::Boolean),
+                Le => left.value_le(&right)?.map(ConstValue::Boolean),
+                Lt => left.value_lt(&right)?.map(ConstValue::Boolean),
+                _ => return Ok(None),
             }),
             // (ConstValue::Field(left), ConstValue::Field(right)) => {
             //     Some(match self.operation {
@@ -91,19 +91,19 @@ impl<'a> ExpressionNode<'a> for BinaryExpression<'a> {
             //         _ => return None,
             //     })
             // },
-            (ConstValue::Boolean(left), ConstValue::Boolean(right)) => Some(match self.operation {
+            (Some(ConstValue::Boolean(left)), Some(ConstValue::Boolean(right))) => Ok(Some(match self.operation {
                 Eq => ConstValue::Boolean(left == right),
                 Ne => ConstValue::Boolean(left != right),
                 And => ConstValue::Boolean(left && right),
                 Or => ConstValue::Boolean(left || right),
-                _ => return None,
-            }),
+                _ => return Ok(None),
+            })),
             //todo: group?
-            (left, right) => Some(match self.operation {
+            (left, right) => Ok(Some(match self.operation {
                 Eq => ConstValue::Boolean(left == right),
                 Ne => ConstValue::Boolean(left != right),
-                _ => return None,
-            }),
+                _ => return Ok(None),
+            })),
         }
     }
 

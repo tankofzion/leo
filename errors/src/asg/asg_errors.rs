@@ -499,4 +499,20 @@ create_errors!(
         msg: format!("Failed to cast value `{}` as target type `{}`.", value, target_type),
         help: None,
     }
+
+    ///
+    @formatted
+    unary_operation_overflows {
+        args: (operator: impl Display, operand: impl Display),
+        msg: format!("Operation overflows or underflows: {} {}.", operator, operand),
+        help: None,
+    }
+
+    /// For when a constant binary operation overflows or underflows.
+    @formatted
+    binary_operation_overflows {
+        args: (left: impl Display, op: impl Display, right: impl Display),
+        msg: format!("Operation overflows or underflows: {} {} {}.", left, op, right),
+        help: None,
+    }
 );

@@ -76,21 +76,24 @@ impl<'a> ExpressionNode<'a> for ArrayRangeAccessExpression<'a> {
             Some(ConstValue::Array(values)) => values,
             _ => return Ok(None),
         };
-        let const_left = match self.left.get().map(|x| x.const_value()) {
-            Some(Ok(Some(ConstValue::Int(x)))) => x.to_usize(),
+
+        let left_span = self.left.get().map(|e| e.span()).flatten().unwrap_or_default();
+        let const_left = match self.left.get().map(|x| x.const_value()).transpose()? {
+            Some(Some(ConstValue::Int(x))) => x.to_usize(left_span)?,
             None => 0,
             _ => return Ok(None),
         };
-        let const_right = match self.right.get().map(|x| x.const_value()) {
-            Some(Ok(Some(ConstValue::Int(x)))) => x.to_usize(),
+        let right_span = self.right.get().map(|e| e.span()).flatten().unwrap_or_default();
+        let const_right = match self.right.get().map(|x| x.const_value()).transpose()? {
+            Some(Some(ConstValue::Int(x))) => x.to_usize(right_span)?,
             None => array.len(),
-            _ => return None,
+            _ => return Ok(None),
         };
         if const_left > const_right || const_right as usize > array.len() {
-            return None;
+            return Ok(None);
         }
 
-        Some(ConstValue::Array(array.drain(const_left..const_right).collect()))
+        Ok(Some(ConstValue::Array(array.drain(const_left..const_right).collect())))
     }
 
     fn is_consty(&self) -> bool {
@@ -140,34 +143,38 @@ impl<'a> FromAst<'a, leo_ast::ArrayRangeAccessExpression> for ArrayRangeAccessEx
             })
             .transpose()?;
 
-        let const_left = match left.map(|x| x.const_value()) {
-            Some(Some(ConstValue::Int(x))) => x.to_usize().map(|x| x as u32),
+        let left_error_span = if let Some(left) = left {
+            left.span().cloned().unwrap_or_default()
+        } else {
+            value.span.clone()
+        };
+        let const_left = match left.map(|x| x.const_value()).transpose()? {
+            Some(Some(ConstValue::Int(x))) => Some(x.to_usize(&left_error_span)? as u32),
             None => Some(0),
             _ => None,
         };
-        let const_right = match right.map(|x| x.const_value()) {
+        let const_right = match right.map(|x| x.const_value()).transpose()? {
             Some(Some(ConstValue::Int(inner_value))) => {
-                let u32_value = inner_value.to_usize().map(|x| x as u32);
-                if let Some(inner_value) = u32_value {
-                    if inner_value > parent_size {
+                let error_span = if let Some(right) = right {
+                    right.span().cloned().unwrap_or_default()
+                } else {
+                    value.span.clone()
+                };
+                let u32_value = inner_value.to_usize(&error_span)? as u32;
+                let inner_value = u32_value;
+                if inner_value > parent_size {
+                    return Err(AsgError::array_index_out_of_bounds(inner_value, &error_span).into());
+                } else if let Some(left) = const_left {
+                    if left > inner_value {
                         let error_span = if let Some(right) = right {
                             right.span().cloned().unwrap_or_default()
                         } else {
                             value.span.clone()
                         };
                         return Err(AsgError::array_index_out_of_bounds(inner_value, &error_span).into());
-                    } else if let Some(left) = const_left {
-                        if left > inner_value {
-                            let error_span = if let Some(right) = right {
-                                right.span().cloned().unwrap_or_default()
-                            } else {
-                                value.span.clone()
-                            };
-                            return Err(AsgError::array_index_out_of_bounds(inner_value, &error_span).into());
-                        }
                     }
                 }
-                u32_value
+                Some(u32_value)
             }
             None => Some(parent_size),
             _ => None,

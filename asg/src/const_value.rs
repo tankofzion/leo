@@ -223,8 +223,8 @@ macro_rules! const_int_cast_op {
 
 macro_rules! const_int_biop {
     ($name: ident, $retType: ty, $x: ident, $y: ident, $transform: expr) => {
-        pub fn $name(&self, other: &ConstInt) -> Option<$retType> {
-            match (self, other) {
+        pub fn $name(&self, other: &ConstInt) -> Result<Option<$retType>> {
+            Ok(match (self, other) {
                 (ConstInt::I8($x), ConstInt::I8($y)) => $transform,
                 (ConstInt::I16($x), ConstInt::I16($y)) => $transform,
                 (ConstInt::I32($x), ConstInt::I32($y)) => $transform,
@@ -236,48 +236,57 @@ macro_rules! const_int_biop {
                 (ConstInt::U64($x), ConstInt::U64($y)) => $transform,
                 (ConstInt::U128($x), ConstInt::U128($y)) => $transform,
                 _ => None,
-            }
+            })
         }
     };
 }
 
 macro_rules! const_int_map {
-    ($name: ident, $x: ident, $transform: expr) => {
-        pub fn $name(&self) -> Option<ConstInt> {
-            Some(match self {
-                ConstInt::I8($x) => ConstInt::I8($transform),
-                ConstInt::I16($x) => ConstInt::I16($transform),
-                ConstInt::I32($x) => ConstInt::I32($transform),
-                ConstInt::I64($x) => ConstInt::I64($transform),
-                ConstInt::I128($x) => ConstInt::I128($transform),
-                ConstInt::U8($x) => ConstInt::U8($transform),
-                ConstInt::U16($x) => ConstInt::U16($transform),
-                ConstInt::U32($x) => ConstInt::U32($transform),
-                ConstInt::U64($x) => ConstInt::U64($transform),
-                ConstInt::U128($x) => ConstInt::U128($transform),
-            })
+    ($name: ident, $op: expr, $x: ident, $transform: expr) => {
+        pub fn $name(&self, span: &Span) -> Result<Option<ConstInt>> {
+            Ok(Some(match self {
+                ConstInt::I8($x) => ConstInt::I8(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+                ConstInt::I16($x) => ConstInt::I16(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+                ConstInt::I32($x) => ConstInt::I32(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+                ConstInt::I64($x) => ConstInt::I64(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+                ConstInt::I128($x) => ConstInt::I128(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+                ConstInt::U8($x) => ConstInt::U8(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+                ConstInt::U16($x) => ConstInt::U16(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+                ConstInt::U32($x) => ConstInt::U32(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+                ConstInt::U64($x) => ConstInt::U64(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+                ConstInt::U128($x) => ConstInt::U128(($transform).ok_or(AsgError::unary_operation_overflows($op, $x, span))?),
+            }))
         }
     };
 }
 
 macro_rules! const_int_bimap {
-    ($name: ident, $x: ident, $y: ident, $transform: expr) => {
-        pub fn $name(&self, other: &ConstInt) -> Option<ConstInt> {
-            Some(match (self, other) {
-                (ConstInt::I8($x), ConstInt::I8($y)) => ConstInt::I8($transform),
-                (ConstInt::I16($x), ConstInt::I16($y)) => ConstInt::I16($transform),
-                (ConstInt::I32($x), ConstInt::I32($y)) => ConstInt::I32($transform),
-                (ConstInt::I64($x), ConstInt::I64($y)) => ConstInt::I64($transform),
-                (ConstInt::I128($x), ConstInt::I128($y)) => ConstInt::I128($transform),
-                (ConstInt::U8($x), ConstInt::U8($y)) => ConstInt::U8($transform),
-                (ConstInt::U16($x), ConstInt::U16($y)) => ConstInt::U16($transform),
-                (ConstInt::U32($x), ConstInt::U32($y)) => ConstInt::U32($transform),
-                (ConstInt::U64($x), ConstInt::U64($y)) => ConstInt::U64($transform),
-                (ConstInt::U128($x), ConstInt::U128($y)) => ConstInt::U128($transform),
-                _ => return None,
-            })
+    ($name: ident, $op: expr, $x: ident, $y: ident, $transform: expr) => {
+        pub fn $name(&self, other: &ConstInt, span: &Span) -> Result<Option<ConstInt>> {
+            Ok(Some(match (self, other) {
+                (ConstInt::I8($x), ConstInt::I8($y)) => ConstInt::I8(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                (ConstInt::I16($x), ConstInt::I16($y)) => ConstInt::I16(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                (ConstInt::I32($x), ConstInt::I32($y)) => ConstInt::I32(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                (ConstInt::I64($x), ConstInt::I64($y)) => ConstInt::I64(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                (ConstInt::I128($x), ConstInt::I128($y)) => ConstInt::I128(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                (ConstInt::U8($x), ConstInt::U8($y)) => ConstInt::U8(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                (ConstInt::U16($x), ConstInt::U16($y)) => ConstInt::U16(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                (ConstInt::U32($x), ConstInt::U32($y)) => ConstInt::U32(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                (ConstInt::U64($x), ConstInt::U64($y)) => ConstInt::U64(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                (ConstInt::U128($x), ConstInt::U128($y)) => ConstInt::U128(($transform).ok_or(AsgError::binary_operation_overflows($x, $op, $y, span))?),
+                _ => return Ok(None),
+            }))
         }
     };
+}
+
+macro_rules! power {
+    ($x: ident, $y: ident) => {
+        {
+            let pow = (*$y).try_into().map_err(|_| AsgError::binary_operation_overflows($x, "**", $y, span))?;
+            x.checked_pow(pow);
+        }
+    }
 }
 
 #[allow(clippy::useless_conversion)]
@@ -285,9 +294,9 @@ macro_rules! const_int_bimap {
 impl ConstInt {
     const_int_op!(raw_value, String, x, format!("{}", x));
 
-    const_int_map!(value_negate, x, x.checked_neg()?);
+    const_int_map!(value_negate, '-', x, x.checked_neg());
 
-    const_int_map!(value_bit_negate, x, !x);
+    const_int_map!(value_bit_negate, '!', x, Some(!x));
 
     const_int_cast_op!(to_usize, usize);
 
@@ -313,16 +322,16 @@ impl ConstInt {
 
     const_int_op!(to_string, String, x, (*x).to_string());
 
-    const_int_bimap!(value_add, x, y, x.checked_add(*y)?);
+    const_int_bimap!(value_add, '+', x, y, x.checked_add(*y));
 
-    const_int_bimap!(value_sub, x, y, x.checked_sub(*y)?);
+    const_int_bimap!(value_sub, '-', x, y, x.checked_sub(*y));
 
-    const_int_bimap!(value_mul, x, y, x.checked_mul(*y)?);
+    const_int_bimap!(value_mul, '*', x, y, x.checked_mul(*y));
 
-    const_int_bimap!(value_div, x, y, x.checked_div(*y)?);
+    const_int_bimap!(value_div, '/', x, y, x.checked_div(*y));
 
     // TODO: limited to 32 bit exponents
-    const_int_bimap!(value_pow, x, y, x.checked_pow((*y).try_into().ok()?)?);
+    const_int_bimap!(value_pow, "**", x, y, power!(x, y));
 
     const_int_biop!(value_lt, bool, x, y, Some(x < y));
 

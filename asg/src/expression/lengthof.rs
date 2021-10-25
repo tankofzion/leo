@@ -54,8 +54,8 @@ impl<'a> ExpressionNode<'a> for LengthOfExpression<'a> {
         false
     }
 
-    fn const_value(&self) -> Option<ConstValue> {
-        None
+    fn const_value(&self) -> Result<Option<ConstValue>> {
+        Ok(None)
     }
 
     fn is_consty(&self) -> bool {

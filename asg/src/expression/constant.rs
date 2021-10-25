@@ -55,8 +55,8 @@ impl<'a> ExpressionNode<'a> for Constant<'a> {
         false
     }
 
-    fn const_value(&self) -> Option<ConstValue<'a>> {
-        Some(self.value.clone())
+    fn const_value(&self) -> Result<Option<ConstValue<'a>>> {
+        Ok(Some(self.value.clone()))
     }
 
     fn is_consty(&self) -> bool {

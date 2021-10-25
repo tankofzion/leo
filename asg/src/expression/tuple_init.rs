@@ -59,16 +59,16 @@ impl<'a> ExpressionNode<'a> for TupleInitExpression<'a> {
         false
     }
 
-    fn const_value(&self) -> Option<ConstValue<'a>> {
+    fn const_value(&self) -> Result<Option<ConstValue<'a>>> {
         let mut consts = vec![];
         for element in self.elements.iter() {
-            if let Some(const_value) = element.get().const_value() {
+            if let Some(const_value) = element.get().const_value()? {
                 consts.push(const_value);
             } else {
-                return None;
+                return Ok(None);
             }
         }
-        Some(ConstValue::Tuple(consts))
+        Ok(Some(ConstValue::Tuple(consts)))
     }
 
     fn is_consty(&self) -> bool {
