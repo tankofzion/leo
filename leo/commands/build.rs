@@ -26,11 +26,11 @@ use leo_package::{
     source::{MainFile, MAIN_FILENAME, SOURCE_DIRECTORY_NAME},
 };
 use leo_parser::parse_program_input;
-use leo_synthesizer::{CircuitSynthesizer, SerializedCircuit};
 
 use snarkvm_curves::bls12_377::Bls12_377;
 use snarkvm_eval::edwards_bls12::EdwardsGroupType;
 use snarkvm_r1cs::ConstraintSystem;
+use snarkvm_synthesizer::{CircuitSynthesizer, SerializedCircuit};
 use structopt::StructOpt;
 use tracing::span::Span;
 

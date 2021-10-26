@@ -61,12 +61,11 @@ version = "1.5.3"
 path = "../ast-passes"
 version = "1.5.3"
 
-[dependencies.leo-synthesizer]
-path = "../synthesizer"
-version = "1.5.3"
-
 [dependencies.tendril]
 version = "0.4"
+
+[dependencies.snarkvm-synthesizer]
+version = "0.7.9"
 
 [dependencies.snarkvm-ir]
 version = "0.7.9"

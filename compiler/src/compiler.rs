@@ -32,7 +32,6 @@ use leo_package::inputs::InputPairs;
 use leo_parser::parse_ast;
 
 use eyre::eyre;
-use leo_synthesizer::CircuitSynthesizer;
 use num_bigint::{BigInt, Sign};
 use sha2::{Digest, Sha256};
 
@@ -42,6 +41,7 @@ use snarkvm_eval::{Evaluator, GroupType, PrimeField};
 use snarkvm_ir::InputData;
 use snarkvm_ir::{Group, Integer, Type, Value};
 use snarkvm_r1cs::ConstraintSystem;
+use snarkvm_synthesizer::CircuitSynthesizer;
 use std::{convert::TryFrom, fs, path::PathBuf};
 
 use indexmap::IndexMap;

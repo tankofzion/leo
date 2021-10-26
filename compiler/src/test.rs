@@ -25,7 +25,6 @@ use leo_asg::*;
 use leo_errors::Result;
 use leo_errors::Span;
 
-use leo_synthesizer::{CircuitSynthesizer, SerializedCircuit, SummarizedCircuit};
 use leo_test_framework::{
     runner::{Namespace, ParseType, Runner},
     Test,
@@ -34,6 +33,7 @@ use serde_yaml::Value;
 use snarkvm_curves::bls12_377::Bls12_377;
 use snarkvm_eval::Evaluator;
 use snarkvm_ir::{InputData, Program as IR_Program};
+use snarkvm_synthesizer::{CircuitSynthesizer, SerializedCircuit, SummarizedCircuit};
 
 use crate::{compiler::Compiler, AstSnapshotOptions, Output};
 use indexmap::IndexMap;

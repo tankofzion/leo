@@ -1322,7 +1322,6 @@ dependencies = [
  "leo-package",
  "leo-parser",
  "leo-state",
- "leo-synthesizer",
  "leo-test-framework",
  "num-bigint",
  "pest",
@@ -1337,6 +1336,7 @@ dependencies = [
  "snarkvm-eval",
  "snarkvm-ir",
  "snarkvm-r1cs",
+ "snarkvm-synthesizer",
  "tempfile",
  "tendril",
  "tracing",
@@ -1405,7 +1405,6 @@ dependencies = [
  "leo-parser",
  "leo-state",
  "leo-stdlib",
- "leo-synthesizer",
  "notify",
  "rand 0.8.4",
  "rand_core 0.6.3",
@@ -1419,6 +1418,7 @@ dependencies = [
  "snarkvm-eval",
  "snarkvm-gadgets",
  "snarkvm-r1cs",
+ "snarkvm-synthesizer",
  "snarkvm-utilities",
  "structopt",
  "test_dir",
@@ -1490,23 +1490,6 @@ dependencies = [
  "leo-ast",
  "leo-errors",
  "leo-parser",
-]
-
-[[package]]
-name = "leo-synthesizer"
-version = "1.5.3"
-dependencies = [
- "eyre",
- "hex",
- "leo-errors",
- "num-bigint",
- "serde",
- "serde_json",
- "sha2",
- "snarkvm-curves",
- "snarkvm-fields",
- "snarkvm-gadgets",
- "snarkvm-r1cs",
 ]
 
 [[package]]
@@ -2705,7 +2688,6 @@ checksum = "1ecab6c735a6bb4139c0caafd0cc3635748bbb3acf4550e8138122099251f309"
 [[package]]
 name = "snarkvm-algorithms"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -2732,7 +2714,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-curves"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "derivative",
  "rand 0.8.4",
@@ -2747,7 +2728,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-derives"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "proc-macro-crate 0.1.5",
  "proc-macro-error",
@@ -2759,7 +2739,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-dpc"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "anyhow",
  "base58",
@@ -2790,7 +2769,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-eval"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "anyhow",
  "im",
@@ -2809,7 +2787,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-fields"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "anyhow",
  "bincode",
@@ -2824,7 +2801,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-gadgets"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "derivative",
  "digest 0.9.0",
@@ -2843,7 +2819,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-ir"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "anyhow",
  "bech32",
@@ -2856,7 +2831,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-marlin"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "blake2",
  "derivative",
@@ -2879,7 +2853,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-parameters"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "curl",
  "hex",
@@ -2891,7 +2864,6 @@ dependencies = [
 [[package]]
 name = "snarkvm-polycommit"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "derivative",
  "digest 0.9.0",
@@ -2909,12 +2881,10 @@ dependencies = [
 [[package]]
 name = "snarkvm-profiler"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 
 [[package]]
 name = "snarkvm-r1cs"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "cfg-if 1.0.0",
  "fxhash",
@@ -2926,9 +2896,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "snarkvm-synthesizer"
+version = "0.7.9"
+dependencies = [
+ "anyhow",
+ "hex",
+ "num-bigint",
+ "serde",
+ "serde_json",
+ "sha2",
+ "snarkvm-curves",
+ "snarkvm-fields",
+ "snarkvm-gadgets",
+ "snarkvm-r1cs",
+]
+
+[[package]]
 name = "snarkvm-utilities"
 version = "0.7.9"
-source = "git+https://github.com/AleoHQ/snarkVM?branch=master#6977e51b79565bb26c42b73e91cf5a3c38847a16"
 dependencies = [
  "anyhow",
  "bincode",
