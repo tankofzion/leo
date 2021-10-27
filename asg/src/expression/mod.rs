@@ -59,9 +59,7 @@ pub use cast::*;
 use crate::{ConstValue, FromAst, Node, PartialType, Scope, Type};
 use leo_errors::{Result, Span};
 
-use serde::Serialize;
-
-#[derive(Clone, Serialize)]
+#[derive(Clone)]
 pub enum Expression<'a> {
     VariableRef(VariableRef<'a>),
     Constant(Constant<'a>),
