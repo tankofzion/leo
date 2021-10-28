@@ -94,7 +94,6 @@ impl<'a> Expression<'a> {
             Ternary(x) => x.id,
             Cast(x) => x.id,
             Access(x) => x.get_id(),
-            LengthOf(x) => x.id,
             ArrayInline(x) => x.id,
             ArrayInit(x) => x.id,
             TupleInit(x) => x.id,
