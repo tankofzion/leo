@@ -13,7 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
-
+/*
 use crate::{verify_record_commitment, StateLeafValues, StateValues};
 use leo_ast::Input as AstInput;
 use leo_errors::{Result, SnarkVMError, StateError};
@@ -94,3 +94,4 @@ pub fn verify_local_data_commitment(dpc: &SystemParameters<Components>, ast_inpu
 
     Ok(result)
 }
+ */

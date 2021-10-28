@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with the Leo library. If not, see <https://www.gnu.org/licenses/>.
 
+/*
 use crate::DPCRecordValues;
 use leo_ast::Record as AstRecord;
 use leo_errors::{Result, SnarkVMError, StateError};
 
 use snarkvm_algorithms::traits::CommitmentScheme;
-use snarkvm_dpc::{
+use snarkvm_dpc::{    testnet1::{instantiated::Components, parameters::SystemParameters},
+    DPCComponents,
     testnet1::{instantiated::Components, parameters::SystemParameters},
     DPCComponents,
 };
@@ -67,3 +69,4 @@ pub fn verify_record_commitment(dpc: &SystemParameters<Components>, ast_record: 
         Err(SnarkVMError::default().into())
     }
 }
+ */
