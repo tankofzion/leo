@@ -131,6 +131,7 @@ impl Namespace for CompileNamespace {
                 asg_initial: false,
                 asg_constants_folded: false,
                 asg_dead_code_eliminated: false,
+                asg_exclude_labels: Vec::new(),
                 emit_ir: true,
             }),
             cwd,
