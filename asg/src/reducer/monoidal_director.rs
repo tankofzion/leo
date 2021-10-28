@@ -55,7 +55,7 @@ impl<'a, T: Monoid, R: MonoidalReducerExpression<'a, T>> MonoidalDirector<'a, T,
         self.reducer.reduce_expression(input, value)
     }
 
-    pub fn reduce_array_init(&mut self, input: &ArrayInitExpression<'a>) -> T {
+    pub fn reduce_array_init(&mut self, input: &'a ArrayInitExpression<'a>) -> T {
         let element = self.reduce_expression(input.element.get());
 
         self.reducer.reduce_array_init(input, element)
@@ -71,7 +71,7 @@ impl<'a, T: Monoid, R: MonoidalReducerExpression<'a, T>> MonoidalDirector<'a, T,
         self.reducer.reduce_array_inline(input, elements)
     }
 
-    pub fn reduce_binary(&mut self, input: &BinaryExpression<'a>) -> T {
+    pub fn reduce_binary(&mut self, input: &'a BinaryExpression<'a>) -> T {
         let left = self.reduce_expression(input.left.get());
         let right = self.reduce_expression(input.right.get());
 
@@ -89,7 +89,7 @@ impl<'a, T: Monoid, R: MonoidalReducerExpression<'a, T>> MonoidalDirector<'a, T,
         self.reducer.reduce_call(input, target, arguments)
     }
 
-    pub fn reduce_circuit_init(&mut self, input: &CircuitInitExpression<'a>) -> T {
+    pub fn reduce_circuit_init(&mut self, input: &'a CircuitInitExpression<'a>) -> T {
         let values = input
             .values
             .iter()
@@ -114,14 +114,14 @@ impl<'a, T: Monoid, R: MonoidalReducerExpression<'a, T>> MonoidalDirector<'a, T,
         self.reducer.reduce_cast_expression(input, inner)
     }
 
-    pub fn reduce_array_access(&mut self, input: &ArrayAccess<'a>) -> T {
+    pub fn reduce_array_access(&mut self, input: &'a ArrayAccess<'a>) -> T {
         let array = self.reduce_expression(input.array.get());
         let index = self.reduce_expression(input.index.get());
 
         self.reducer.reduce_array_access(input, array, index)
     }
 
-    pub fn reduce_array_range_access(&mut self, input: &ArrayRangeAccess<'a>) -> T {
+    pub fn reduce_array_range_access(&mut self, input: &'a ArrayRangeAccess<'a>) -> T {
         let array = self.reduce_expression(input.array.get());
         let left = input.left.get().map(|e| self.reduce_expression(e));
         let right = input.right.get().map(|e| self.reduce_expression(e));
@@ -129,7 +129,7 @@ impl<'a, T: Monoid, R: MonoidalReducerExpression<'a, T>> MonoidalDirector<'a, T,
         self.reducer.reduce_array_range_access(input, array, left, right)
     }
 
-    pub fn reduce_circuit_access(&mut self, input: &CircuitAccess<'a>) -> T {
+    pub fn reduce_circuit_access(&mut self, input: &'a CircuitAccess<'a>) -> T {
         let target = input.target.get().map(|e| self.reduce_expression(e));
 
         self.reducer.reduce_circuit_access(input, target)
@@ -139,13 +139,13 @@ impl<'a, T: Monoid, R: MonoidalReducerExpression<'a, T>> MonoidalDirector<'a, T,
         self.reducer.reduce_constant(input)
     }
 
-    pub fn reduce_tuple_access(&mut self, input: &TupleAccess<'a>) -> T {
+    pub fn reduce_tuple_access(&mut self, input: &'a TupleAccess<'a>) -> T {
         let tuple_ref = self.reduce_expression(input.tuple_ref.get());
 
         self.reducer.reduce_tuple_access(input, tuple_ref)
     }
 
-    pub fn reduce_access_expression(&mut self, input: &AccessExpression<'a>) -> T {
+    pub fn reduce_access_expression(&mut self, input: &'a AccessExpression<'a>) -> T {
         use AccessExpression::*;
 
         match input {
@@ -156,7 +156,7 @@ impl<'a, T: Monoid, R: MonoidalReducerExpression<'a, T>> MonoidalDirector<'a, T,
         }
     }
 
-    pub fn reduce_tuple_init(&mut self, input: &TupleInitExpression<'a>) -> T {
+    pub fn reduce_tuple_init(&mut self, input: &'a TupleInitExpression<'a>) -> T {
         let values = input.elements.iter().map(|e| self.reduce_expression(e.get())).collect();
 
         self.reducer.reduce_tuple_init(input, values)
