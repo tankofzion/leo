@@ -12,6 +12,7 @@ function main(y: bool) -> bool {
 }
 
 // use std import to test import order
-import std.unstable.blake2s.Blake2s;
+// import std.unstable.blake2s.Blake2s;
+// TODO @gluax add once we have a non pre included import.
 
 circuit Foo {}

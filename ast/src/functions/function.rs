@@ -17,16 +17,18 @@
 use crate::{Annotation, Block, FunctionInput, Identifier, Node, Type};
 use leo_errors::Span;
 
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Function {
-    pub annotations: Vec<Annotation>,
+    pub annotations: IndexMap<String, Annotation>,
     pub identifier: Identifier,
     pub input: Vec<FunctionInput>,
     pub const_: bool,
     pub output: Option<Type>,
+    pub core_mapping: std::cell::RefCell<Option<String>>,
     pub block: Block,
     pub span: Span,
 }
