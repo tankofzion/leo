@@ -43,15 +43,15 @@ create_errors!(
         help: None,
     }
 
-     /// For when there is no main function in a Leo program.
+    /// For when there is no main function in a Leo program.
     @backtraced
-    no_main_function {
+    no_main_entrypoint_function {
         args: (),
-        msg: "There must be a function named `main`",
+        msg: "There must be exactly one function with @main_entrypoint annotation",
         help: None,
     }
 
-     /// For when the compiler can't find the test input files with the specified name.
+    /// For when the compiler can't find the test input files with the specified name.
     @backtraced
     no_test_input {
         args: (),

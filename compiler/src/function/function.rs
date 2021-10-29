@@ -21,7 +21,7 @@ use crate::program::Program;
 use leo_asg::{Expression, Function, FunctionQualifier};
 use leo_errors::CompilerError;
 use leo_errors::Result;
-use snarkvm_ir::{CallCoreData, CallData, Instruction, Integer, PredicateData, QueryData, Value};
+use snarkvm_ir::{CallCoreData, CallData, CallEntryPointData, Instruction, Integer, PredicateData, QueryData, Value};
 use std::cell::Cell;
 
 impl<'a> Program<'a> {
@@ -85,6 +85,12 @@ impl<'a> Program<'a> {
                 identifier: core_mapping,
                 arguments: ir_arguments,
             }));
+        } else if function.is_entrypoint() {
+            self.emit(Instruction::CallEntryPoint(CallEntryPointData {
+                destination: output,
+                index: self.resolve_function(function),
+                arguments: ir_arguments,
+            }))
         } else {
             self.emit(Instruction::Call(CallData {
                 destination: output,

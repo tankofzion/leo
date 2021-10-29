@@ -19,7 +19,7 @@
 use crate::{asg_group_coordinate_to_ir, decode_address, CompilerOptions, Output, OutputFile, Program};
 use crate::{OutputOptions, TypeInferencePhase};
 pub use leo_asg::{new_context, AsgContext as Context, AsgContext};
-use leo_asg::{Asg, AsgPass, CircuitMember, GroupValue, Program as AsgProgram};
+use leo_asg::{Asg, AsgPass, GroupValue, Program as AsgProgram};
 use leo_ast::AstPass;
 use leo_ast::{InputValue, IntegerType, Program as AstProgram};
 use leo_errors::AsgError;
@@ -27,7 +27,7 @@ use leo_errors::SnarkVMError;
 use leo_errors::StateError;
 use leo_errors::{CompilerError, Result, Span};
 use leo_imports::ImportParser;
-use leo_input::LeoInputParser;
+// use leo_input::LeoInputParser;
 use leo_package::inputs::InputPairs;
 use leo_parser::parse_ast;
 
@@ -318,78 +318,78 @@ impl<'a> Compiler<'a> {
 
     fn compile_ir_test(
         &self,
-        program: &Program<'a>,
-        function: &'a leo_asg::Function<'a>,
-        input: &InputPairs,
+        _program: &Program<'a>,
+        _function: &'a leo_asg::Function<'a>,
+        _input: &InputPairs,
     ) -> Result<(leo_ast::Input, snarkvm_ir::Program, String)> {
-        let program_name = program.asg.name.clone();
-        let mut output_file_name = program_name.clone();
+        todo!("re-enable tests");
+        /* let program_name = program.asg.name.clone();
+               let mut _output_file_name = program_name.clone();
 
-        let input_file = function.annotations.get("test").unwrap().arguments.get(0);
-        // get input file name from annotation or use test_name
-        let input_pair = match input_file {
-            Some(file_id) => {
-                let file_name = file_id.clone();
-                let file_name_kebab = file_name.to_string().replace("_", "-");
+               let input_file = function.annotations.get("test").unwrap().arguments.get(0);
+               // get input file name from annotation or use test_name
+               let input_pair = match input_file {
+                   Some(file_id) => {
+                       let file_name = file_id.clone();
+                       let file_name_kebab = file_name.to_string().replace("_", "-");
 
-                // transform "test_name" into "test-name"
-                output_file_name = file_name.to_string();
+                       // transform "test_name" into "test-name"
+                       _output_file_name = file_name.to_string();
 
-                // searches for test_input (snake case) or for test-input (kebab case)
-                match input
-                    .pairs
-                    .get(&file_name_kebab)
-                    .or_else(|| input.pairs.get(&file_name_kebab))
-                {
-                    Some(pair) => pair.to_owned(),
-                    None => {
-                        return Err(CompilerError::invalid_test_context(file_name).into());
-                    }
-                }
-            }
-            None => input
-                .pairs
-                .get(&program_name)
-                .ok_or_else(CompilerError::no_test_input)?,
-        };
+                       // searches for test_input (snake case) or for test-input (kebab case)
+                       match input
+                           .pairs
+                           .get(&file_name_kebab)
+                           .or_else(|| input.pairs.get(&file_name_kebab))
+                       {
+                           Some(pair) => pair.to_owned(),
+                           None => {
+                               return Err(CompilerError::invalid_test_context(file_name).into());
+                           }
+                       }
+                   }
+                   None => input
+                       .pairs
+                       .get(&program_name)
+                       .ok_or_else(CompilerError::no_test_input)?,
+               };
 
-        // parse input files to abstract syntax trees
-        let input_file = &input_pair.input_file;
-        let state_file = &input_pair.state_file;
+               // parse input files to abstract syntax trees
+               let input_file = &input_pair.input_file;
+               let state_file = &input_pair.state_file;
 
-        let input_ast = LeoInputParser::parse_file(input_file)?;
-        let state_ast = LeoInputParser::parse_file(state_file)?;
+               let input_ast = LeoInputParser::parse_file(input_file)?;
+               let state_ast = LeoInputParser::parse_file(state_file)?;
 
-        // parse input files into input struct
-        let mut input = leo_ast::Input::new();
-        input.parse_input(input_ast)?;
-        input.parse_state(state_ast)?;
+               // parse input files into input struct
+               let mut input = leo_ast::Input::new();
+               input.parse_input(input_ast)?;
+               input.parse_state(state_ast)?;
 
-        let secondary_functions: Vec<_> = program
-            .asg
-            .scope
-            .get_functions()
-            .iter()
-            .filter(|(_, func)| !func.is_test())
-            .map(|(_, f)| *f)
-            .chain(program.asg.scope.get_circuits().iter().flat_map(|(_, circuit)| {
-                circuit
-                    .members
-                    .borrow()
-                    .iter()
-                    .flat_map(|(_, member)| match member {
-                        CircuitMember::Function(function) => Some(*function),
-                        CircuitMember::Variable(_) => None,
-                    })
-                    .collect::<Vec<_>>()
-                    .into_iter()
-            }))
-            .collect();
-
+               let _secondary_functions: Vec<_> = program
+                   .asg
+                   .scope
+                   .get_functions()
+                   .iter()
+                   .filter(|(_, func)| !func.is_test())
+                   .map(|(_, f)| *f)
+                   .chain(program.asg.scope.get_circuits().iter().flat_map(|(_, circuit)| {
+                       circuit
+                           .members
+                           .borrow()
+                           .iter()
+                           .flat_map(|(_, member)| match member {
+                               CircuitMember::Function(function) => Some(*function),
+                               CircuitMember::Variable(_) => None,
+                           })
+                           .collect::<Vec<_>>()
+                           .into_iter()
+                   }))
+                   .collect();
         // run test function on new program with input
         let mut temporary_program = program.clone();
         temporary_program.enforce_function(&program.asg, function, &secondary_functions, &input)?;
-        Ok((input, temporary_program.render(&self.options), output_file_name))
+        Ok((input, temporary_program.render(&self.options), output_file_name)) */
     }
 
     pub fn compile_test(&self, input: InputPairs) -> Result<(u32, u32)> {
@@ -572,25 +572,28 @@ impl<'a> Compiler<'a> {
 
     pub fn process_input(&self, input: &leo_ast::Input, ir: &snarkvm_ir::Header) -> Result<InputData> {
         let program = self.asg.as_ref().unwrap();
-        let main_function = *program.functions.get("main").expect("missing main function");
-        let span = main_function.span.clone().unwrap_or_default();
+        let entrypoint = program
+            .functions
+            .iter()
+            .find_map(|(_, f)| if f.is_main_entrypoint() { Some(f) } else { None })
+            .ok_or_else(CompilerError::no_main_entrypoint_function)?;
+
+        let span = entrypoint.span.clone().unwrap_or_default();
 
         let mut out = InputData::default();
         for ir_input in &ir.main_inputs {
-            let value = input
-                .get(&*ir_input.name)
-                .flatten()
-                .ok_or_else(|| CompilerError::function_input_not_found("main", &ir_input.name, &span))?;
+            let value = input.get(&*ir_input.name).flatten().ok_or_else(|| {
+                CompilerError::function_input_not_found(entrypoint.name.borrow().name.clone(), &ir_input.name, &span)
+            })?;
             out.main.insert(
                 ir_input.name.clone(),
                 Self::process_input_value(value, &ir_input.type_, &span)?,
             );
         }
         for ir_input in &ir.constant_inputs {
-            let value = input
-                .get_constant(&*ir_input.name)
-                .flatten()
-                .ok_or_else(|| CompilerError::function_input_not_found("main", &ir_input.name, &span))?;
+            let value = input.get_constant(&*ir_input.name).flatten().ok_or_else(|| {
+                CompilerError::function_input_not_found(entrypoint.name.borrow().name.clone(), &ir_input.name, &span)
+            })?;
             out.constants.insert(
                 ir_input.name.clone(),
                 Self::process_input_value(value, &ir_input.type_, &span)?,

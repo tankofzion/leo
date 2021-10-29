@@ -35,7 +35,6 @@ pub(crate) struct IrFunction {
     argument_start_variable: u32,
     instructions: Vec<Instruction>,
 }
-
 #[derive(Clone, Debug)]
 pub(crate) struct Program<'a> {
     pub asg: leo_asg::Program<'a>,
@@ -53,7 +52,7 @@ impl<'a> Program<'a> {
         Self {
             asg,
             current_function: None,
-            functions: vec![],
+            functions: Vec::new(),
             function_to_index: IndexMap::new(),
             next_register: 0,
             inputs: IndexMap::new(),
@@ -136,7 +135,7 @@ impl<'a> Program<'a> {
         self.function_to_index.insert(function.id, len as u32);
     }
 
-    pub fn begin_main_function(&mut self, function: &'a Function<'a>) {
+    pub fn begin_main_entrypoint(&mut self, function: &'a Function<'a>) {
         self.current_function = Some(function);
         self.functions.push(IrFunction {
             instructions: vec![],

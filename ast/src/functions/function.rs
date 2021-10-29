@@ -49,12 +49,10 @@ impl Function {
         &self.identifier.name
     }
 
-    ///
-    /// Returns `true` if the function name is `main`.
+    /// Returns `true` if the function has the `entrypoint` annotation.
     /// Returns false otherwise.
-    ///
-    pub fn is_main(&self) -> bool {
-        self.get_name() == "main"
+    pub fn is_entrypoint(&self) -> bool {
+        self.annotations.contains_key("entrypoint") || self.annotations.contains_key("main_entrypoint")
     }
 
     ///

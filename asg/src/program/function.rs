@@ -75,6 +75,30 @@ impl<'a> PartialEq for Function<'a> {
 impl<'a> Eq for Function<'a> {}
 
 impl<'a> Function<'a> {
+    /// Returns `true` if the function has the `entrypoint` annotation.
+    /// Returns false otherwise.
+    pub fn is_sub_entrypoint(&self) -> bool {
+        self.annotations.contains_key("entrypoint")
+    }
+
+    /// Returns `true` if the function has the `main_entrypoint` annotation.
+    /// Returns false otherwise.
+    pub fn is_main_entrypoint(&self) -> bool {
+        self.annotations.contains_key("main_entrypoint")
+    }
+
+    // Returns `true` if the function has the `entrypoint` or `main_entrypoint` annotation.
+    /// Returns false otherwise.
+    pub fn is_entrypoint(&self) -> bool {
+        self.is_main_entrypoint() || self.is_sub_entrypoint()
+    }
+
+    /// Returns `true` if the function has no `entrypoint` annotation.
+    /// Returns false otherwise
+    pub fn is_not_entrypoint(&self) -> bool {
+        !self.is_sub_entrypoint() && !self.is_main_entrypoint()
+    }
+
     pub(crate) fn init(scope: &'a Scope<'a>, value: &leo_ast::Function) -> Result<&'a Function<'a>> {
         let output: Type<'a> = value
             .output
@@ -160,27 +184,17 @@ impl<'a> Function<'a> {
                 .insert("self".to_string(), self_variable);
         }
 
-        if value.is_main() {
-            if let Some((_, annotation)) = value.annotations.first() {
-                return Err(
-                    AsgError::main_cannot_have_annotations(&(&annotation.span + &value.identifier.span)).into(),
-                );
-            }
-        } else {
-            let illegal_annotations = value
-                .annotations
-                .iter()
-                .filter(|(_, annotation)| !annotation.is_valid_annotation());
-            if let Some((name, annotation)) = illegal_annotations.clone().next() {
-                return Err(
-                    AsgError::unsupported_annotation(name, &(&annotation.span + &value.identifier.span)).into(),
-                );
-            }
+        let illegal_annotations = value
+            .annotations
+            .iter()
+            .filter(|(_, annotation)| !annotation.is_valid_annotation());
+        if let Some((name, annotation)) = illegal_annotations.clone().next() {
+            return Err(AsgError::unsupported_annotation(name, &(&annotation.span + &value.identifier.span)).into());
         }
 
         if value.const_ {
-            if value.is_main() {
-                return Err(AsgError::main_cannot_be_const(&value.identifier.span).into());
+            if value.is_entrypoint() {
+                return Err(AsgError::entrypoint_cannot_be_const(&value.identifier.span).into());
             }
 
             let non_const_input = value.input.iter().find(|a| {

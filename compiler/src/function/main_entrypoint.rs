@@ -24,7 +24,7 @@ use leo_errors::Result;
 use std::cell::Cell;
 
 impl<'a> Program<'a> {
-    pub fn enforce_main_function(&mut self, function: &'a Function<'a>, input: &leo_ast::Input) -> Result<()> {
+    pub fn enforce_main_entrypoint(&mut self, function: &'a Function<'a>, input: &leo_ast::Input) -> Result<()> {
         // Iterate over main function input variables and allocate new values
         let asg_input = function.scope.resolve_input();
 

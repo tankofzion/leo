@@ -494,7 +494,7 @@ create_errors!(
 
     /// For when const function modifier is added to the main function.
     @formatted
-    main_cannot_be_const {
+    entrypoint_cannot_be_const {
         args: (),
         msg: "main function cannot be const",
         help: None,
@@ -505,14 +505,6 @@ create_errors!(
     const_function_cannot_have_inputs {
         args: (),
         msg: "const function cannot have non-const input",
-        help: None,
-    }
-
-    /// For when `main` is annotated.
-    @formatted
-    main_cannot_have_annotations {
-        args: (),
-        msg: "main function cannot have annotations",
         help: None,
     }
 

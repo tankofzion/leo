@@ -22,7 +22,7 @@ pub use self::input::*;
 pub mod function;
 pub use self::function::*;
 
-pub mod main_function;
-pub use self::main_function::*;
+pub mod main_entrypoint;
+pub use self::main_entrypoint::*;
 
 mod mut_target;
